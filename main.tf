@@ -5,6 +5,88 @@ provider "aws" {
    secret_key = var.secret_key
  }
 
+
+# We can set up multiple providers and use them for creating resources in different regions or in different AWS accounts by creating aliases.
+# Some AWS services require the us-east-1 (N. Virginia) region to be configured:
+# To use an ACM certificate with CloudFront, we must request or import the certificate in the US East (N. Virginia) region.
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
+  access_key = var.access_key
+  secret_key = var.secret_key 
+}
+
+
+
+## AWS Route53 is a DNS service used to perform three main functions: domain registration, DNS routing, and health checking.
+# The first step to configure the DNS service for our domain (eg: example.com) is to create the public hosted zone 
+# the name server (NS) record, and the start of a zone of authority (SOA) record are automatically created by AWS
+resource  "aws_route53_zone" "main" {
+  name         = var.website-domain
+}
+
+
+# We use ACM (AWS Certificate Manager) to create the wildcard certificate *.<yourdomain.com>
+# This resource won't be created until we receive the email verifying we own the domain and we click on the confirmation link.
+resource "aws_acm_certificate" "wildcard_website" {
+  # We refer to the aliased provider ( ${provider_name}.${alias} ) for creating our ACM resource. 
+  provider                  = aws.us-east-1
+  # We want a wildcard cert so we can host subdomains later.
+  domain_name       = "*.${var.website-domain}" 
+  # We also want the cert to be valid for the root domain even though we'll be redirecting to the www. domain immediately.
+  subject_alternative_names = ["${var.website-domain}"]
+  # Which method to use for validation. DNS or EMAIL are valid, NONE can be used for certificates that were imported into ACM and then into Terraform. 
+  validation_method         = "EMAIL"
+
+  # (Optional) A mapping of tags to assign to the resource. 
+  tags = merge(var.tags, {
+    ManagedBy = "terraform"
+    Changed   = formatdate("YYYY-MM-DD hh:mm ZZZ", timestamp())
+  })
+
+  # The lifecycle block is available for all resource blocks regardless of type
+  # create_before_destroy(bool), prevent_destroy(bool), and ignore_changes(list of attribute names)
+  # to be used when a resource is created with references to data that may change in the future, but should not affect said resource after its creation 
+  lifecycle {
+    ignore_changes = [tags["Changed"]]
+  }
+
+}
+
+
+# This resource is simply a waiter for manual email approval of ACM certificates.
+# We use the aws_acm_certificate_validation resource to wait for the newly created certificate to become valid
+# and then use its outputs to associate the certificate Amazon Resource Name (ARN) with the CloudFront distribution
+# The certificate Amazon Resource Name (ARN) provided by aws_acm_certificate looks identical, but is almost always going to be invalid right away. 
+# Using the output from the validation resource ensures that Terraform will wait for ACM to validate the certificate before resolving its ARN.
+resource "aws_acm_certificate_validation" "wildcard_cert" {
+  provider                = aws.us-east-1
+  certificate_arn         = aws_acm_certificate.wildcard_website.arn
+}
+
+
+## Find a certificate that is issued
+## Get the ARN of the issued certificate in AWS Certificate Manager (ACM)
+data "aws_acm_certificate" "wildcard_website" {
+  provider = aws.us-east-1
+
+  # This argument is available for all resource blocks, regardless of resource type
+  # Necessary when a resource or module relies on some other resource's behavior but doesn't access any of that resource's data in its arguments
+  depends_on = [
+    aws_acm_certificate.wildcard_website,
+    aws_acm_certificate_validation.wildcard_cert,
+  ]
+
+  # (Required) The domain of the certificate to look up 
+  domain      = "*.${var.website-domain}" #var.www-website-domain 
+  # (Optional) A list of statuses on which to filter the returned list. Default is ISSUED if no value is specified
+  # Valid values are PENDING_VALIDATION, ISSUED, INACTIVE, EXPIRED, VALIDATION_TIMED_OUT, REVOKED and FAILED 
+  statuses    = ["ISSUED"]
+  # Returning only the most recent one 
+  most_recent = true
+}
+
+
 # We create a new VPC
 resource "aws_vpc" "vpc" {
    cidr_block = var.vpc_cidr 
