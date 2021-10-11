@@ -18,6 +18,24 @@ variable "ec2_type" {
   default = "t2.micro"
 }
 
+variable "website-domain" {
+  description = "Root domain"
+  type        = string
+  default     = "chatsfeed.com"
+}
+
+variable "www-website-domain" {
+  description = "Main website domain"
+  type        = string
+  default     = "www.chatsfeed.com"
+}
+
+variable "app-website-domain" {
+  description = "Portal website domain"
+  type        = string
+  default     = "app.chatsfeed.com"
+}
+
 variable "ec2_ami" {
   description = "The ami image to use for ec2 instances"
   default = "ami-077e31c4939f6a2f3"
@@ -39,22 +57,22 @@ variable "vpc_cidr" {
 }
 
 variable "public_subnet_1_CIDR" {
-  description = "Public Subnet AZ 1 CIDR"
+  description = "Public Subnet 1 AZ 1 CIDR"
   default = "192.168.1.0/24"
 }
 
 variable "public_subnet_2_CIDR" {
-  description = "Public Subnet AZ 1 CIDR"
+  description = "Public Subnet 2 AZ 2 CIDR"
   default = "192.168.2.0/24"
 }
 
 variable "private_subnet_1_CIDR" {
-  description = "Private Subnet AZ 1 CIDR"
+  description = "Private Subnet 1 AZ 1 CIDR"
   default = "192.168.10.0/24"
 }
 
 variable "private_subnet_2_CIDR" {
-  description = "Private Subnet AZ 1 CIDR"
+  description = "Private Subnet 2 AZ 2 CIDR"
   default = "192.168.20.0/24"
 }
 
