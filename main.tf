@@ -624,13 +624,25 @@ resource "aws_alb_listener" "listener_load_balancer" {
 
   default_action {
     target_group_arn = aws_alb_target_group.tg_load_balancer.id
-    type             = "forward"
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 
   depends_on = [
     aws_alb.load_balancer,
     aws_alb_target_group.tg_load_balancer
   ]
+}
+
+# We setup ssl
+resource "aws_lb_listener_certificate" "ourservice_ssl_cert" {
+  listener_arn    = "aws_alb_listener.listener_load_balancer.arn"
+  certificate_arn = "aws_acm_certificate.wildcard_website.arn"
 }
 
 # We create a security group for our wordpress instance
