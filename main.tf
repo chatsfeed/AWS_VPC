@@ -18,6 +18,12 @@ terraform {
 }
 
 
+provider "aws" {
+   region  = var.aws_region
+   access_key = var.access_key
+   secret_key = var.secret_key
+}
+
 
 # We can set up multiple providers and use them for creating resources in different regions or in different AWS accounts by creating aliases.
 # Some AWS services require the us-east-1 (N. Virginia) region to be configured:
