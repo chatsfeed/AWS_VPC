@@ -591,8 +591,9 @@ resource "aws_alb_listener" "listener_load_balancer" {
 
 # We setup ssl
 resource "aws_lb_listener_certificate" "ourservice_ssl_cert" {
-  listener_arn    = "aws_alb_listener.listener_load_balancer.arn"
-  certificate_arn = "aws_acm_certificate.wildcard_website.arn"
+  listener_arn    = aws_alb_listener.listener_load_balancer.arn
+  certificate_arn = aws_acm_certificate.wildcard_website.arn
+  depends_on = [aws_alb_listener.listener_load_balancer.arn, aws_acm_certificate.wildcard_website.arn]
 }
 
 # We create a security group for our wordpress instance
