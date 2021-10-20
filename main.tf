@@ -569,18 +569,15 @@ resource "aws_alb" "load_balancer" {
 # We create a listener for our application load balancer
 resource "aws_alb_listener" "listener_load_balancer" {
   load_balancer_arn = aws_alb.load_balancer.id
-  port              = "80"
-  protocol          = "HTTP"
+  port              = "443"
+  protocol          = "HTTPS"
+  
+  ssl_policy = "ELBSecurityPolicy-2016–08"
+  certificate_arn = data.aws_acm_certificate.wildcard_website.arn
 
   default_action {
     target_group_arn = aws_alb_target_group.tg_load_balancer.id
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+    type = "forward"
   }
 
   depends_on = [
@@ -590,15 +587,15 @@ resource "aws_alb_listener" "listener_load_balancer" {
 }
 
 # We setup ssl
-resource "aws_lb_listener_certificate" "ourservice_ssl_cert" {
-  listener_arn    = aws_alb_listener.listener_load_balancer.arn
-  certificate_arn = data.aws_acm_certificate.wildcard_website.arn
-  depends_on = [
-    aws_acm_certificate.wildcard_website,
-    aws_alb_listener.listener_load_balancer
-  ] 
+#resource "aws_lb_listener_certificate" "ourservice_ssl_cert" {
+  #listener_arn    = aws_alb_listener.listener_load_balancer.arn
+  #certificate_arn = data.aws_acm_certificate.wildcard_website.arn
+  #depends_on = [
+    #aws_acm_certificate.wildcard_website,
+    #aws_alb_listener.listener_load_balancer
+  #] 
    
-}
+#}
 
 # We create a security group for our wordpress instance
 resource "aws_security_group" "security_group_wordpress" {
