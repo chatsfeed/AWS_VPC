@@ -13,7 +13,7 @@ pipeline {
   stages {
     stage('TerraformInit'){
         steps {
-            sh "terraform init -input=false"
+            sh "terraform init --backend-config='access_key=$ACCESS_KEY' --backend-config='secret_key=$SECRET_KEY'"
         }
     }
     stage('Terraform workspace') {
