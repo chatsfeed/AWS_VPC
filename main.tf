@@ -421,11 +421,11 @@ resource "aws_instance" "bastion_host_1" {
    }
    provisioner "file" {
     source      = "${var.key_path}${var.private_key_name}.pem"
-    destination = "/home/ec2-user/private_ssh_key.pem"
+    destination = "/home/ubuntu/private_ssh_key.pem"
 
     connection {
     type     = "ssh"
-    user     = "ec2-user"
+    user     = "ubuntu"
     private_key = tls_private_key.ssh_key.private_key_pem
     host     = aws_instance.bastion_host_1.public_ip
     }
@@ -448,11 +448,11 @@ resource "aws_instance" "bastion_host_2" {
    }
    provisioner "file" {
     source      = "${var.key_path}${var.private_key_name}.pem"
-    destination = "/home/ec2-user/private_ssh_key.pem"
+    destination = "/home/ubuntu/private_ssh_key.pem"
 
     connection {
     type     = "ssh"
-    user     = "ec2-user"
+    user     = "ubuntu"
     private_key = tls_private_key.ssh_key.private_key_pem
     host     = aws_instance.bastion_host_2.public_ip
     }
