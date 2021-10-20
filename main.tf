@@ -13,7 +13,7 @@ terraform {
   backend "s3" {
     # Replace this with your bucket name!
     bucket         = "chatsfeed-terraform-remote-state-s3"
-    key            = "global/s3/terraform.tfstate"
+    key            = "terraform.tfstate"
     region         = "us-east-2"
     # Replace this with your DynamoDB table name!
     dynamodb_table = "chatsfeed-terraform-remote-state-s3-locks"
