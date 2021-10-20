@@ -1,3 +1,11 @@
+
+provider "aws" {
+   region  = var.aws_region
+   access_key = var.access_key
+   secret_key = var.secret_key
+}
+
+
 # ------------------------------------------------------------------------------
 # CONFIGURE TERRAFORM BACKEND
 # ------------------------------------------------------------------------------
@@ -15,13 +23,6 @@ terraform {
   # this is why we first have to create those resources to then run our terraform with remote state in s3
   # the state file will be local on the first run to create the resources, then will be remote on the second run
   #depends_on = [aws_s3_bucket.terraform_state, aws_dynamodb_table.terraform_locks]
-}
-
-
-provider "aws" {
-   region  = var.aws_region
-   access_key = var.access_key
-   secret_key = var.secret_key
 }
 
 
