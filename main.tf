@@ -14,7 +14,9 @@ terraform {
     # Replace this with your bucket name!
     bucket         = "chatsfeed-terraform-remote-state-s3"
     key            = "terraform.tfstate"
-    region         = "us-east-2"
+    region  = var.aws_region
+    access_key = var.access_key
+    secret_key = var.secret_key
     # Replace this with your DynamoDB table name!
     dynamodb_table = "chatsfeed-terraform-remote-state-s3-locks"
     encrypt        = true
