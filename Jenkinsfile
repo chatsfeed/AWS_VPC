@@ -7,8 +7,8 @@ pipeline {
     TF_HOME = tool('terraform-0.15.3')
     TF_IN_AUTOMATION = "true"
     PATH = "$TF_HOME:$PATH"
-    ACCESS_KEY = credentials('AWS_ACCESS_KEY_ID')
-    SECRET_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    ACCESS_KEY = credentials('chatsfeed_access')
+    SECRET_KEY = credentials('chatsfeed_secret')
   }
   stages {
     stage('TerraformInit'){
