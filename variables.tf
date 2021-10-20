@@ -90,3 +90,9 @@ variable "key_path" {
   type        = string
   default     = "/var/lib/jenkins/.ssh/"
 }
+
+variable "tags" {
+  description = "Tags added to resources"
+  default     = {}
+  type        = map(string)
+}
