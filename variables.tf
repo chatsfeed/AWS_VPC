@@ -37,8 +37,8 @@ variable "app-website-domain" {
 }
 
 variable "ec2_ami" {
-  description = "The ami image to use for ec2 instances"
-  default = "ami-077e31c4939f6a2f3"
+  description = "The ubuntu 20.04 ami image to use for ec2 instances"
+  default = "ami-0e5e17317f99b2932" 
 }
 
 variable "access_key" {
