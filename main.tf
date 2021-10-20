@@ -572,7 +572,7 @@ resource "aws_alb_listener" "listener_load_balancer" {
   port              = "443"
   protocol          = "HTTPS"
   
-  ssl_policy = "ELBSecurityPolicy-2016–08"
+
   certificate_arn = data.aws_acm_certificate.wildcard_website.arn
 
   default_action {
