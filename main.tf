@@ -108,27 +108,27 @@ data "aws_acm_certificate" "wildcard_website" {
 }
 
 # Creates the DNS record to point on the application load balancer
-#resource "aws_route53_record" "website_alb_root_record" {
-  ##zone_id = data.aws_route53_zone.wildcard_website.zone_id
-  #zone_id = "${aws_route53_zone.main.zone_id}"
-  #name    = var.website-domain
-  #type    = "A"
+resource "aws_route53_record" "website_alb_root_record" {
+  #zone_id = data.aws_route53_zone.wildcard_website.zone_id
+  zone_id = "${aws_route53_zone.main.zone_id}"
+  name    = var.website-domain
+  type    = "A"
 
-  #alias {
-    #name                   = aws_alb.load_balancer.dns_name
-    #zone_id                = aws_alb.load_balancer.zone_id
-    #evaluate_target_health = true
-  #}
-#}
-
-
-resource "aws_route53_record" "cert_validation" {
-  name = aws_acm_certificate.wildcard_website.domain_validation_options.0.resource_record_name
-  type = aws_acm_certificate.wildcard_website.domain_validation_options.0.resource_record_type
-  zone_id = data.aws_route53_zone.main.id
-  records = [aws_acm_certificate.wildcard_website.domain_validation_options.0.resource_record_value]
-  ttl = 60
+  alias {
+    name                   = aws_alb.load_balancer.dns_name
+    zone_id                = aws_alb.load_balancer.zone_id
+    evaluate_target_health = true
+  }
 }
+
+
+#resource "aws_route53_record" "cert_validation" {
+  #name = aws_acm_certificate.wildcard_website.domain_validation_options.0.resource_record_name
+  #type = aws_acm_certificate.wildcard_website.domain_validation_options.0.resource_record_type
+  #zone_id = data.aws_route53_zone.main.id
+  #records = [aws_acm_certificate.wildcard_website.domain_validation_options.0.resource_record_value]
+  #ttl = 60
+#}
 
 
 
