@@ -106,6 +106,28 @@ data "aws_acm_certificate" "wildcard_website" {
   most_recent = true
 }
 
+# Creates the DNS record to point on the application load balancer
+resource "aws_route53_record" "website_alb_root_record" {
+  #zone_id = data.aws_route53_zone.wildcard_website.zone_id
+  zone_id = "${aws_route53_zone.main.zone_id}"
+  name    = var.www-website-domain
+  type    = "A"
+
+  alias {
+    name                   = aws_alb.load_balancer.dns_name
+    zone_id                = aws_alb.load_balancer.zone_id
+    evaluate_target_health = true
+  }
+}
+
+
+
+
+
+
+
+
+
 
 # We create a new VPC
 resource "aws_vpc" "vpc" {
@@ -588,6 +610,7 @@ resource "aws_alb_listener" "listener_load_balancer" {
 
 # We setup ssl
 resource "aws_lb_listener_certificate" "ourservice_ssl_cert" {
+  provider = aws.us-east-1 
   listener_arn    = aws_alb_listener.listener_load_balancer.arn
   certificate_arn = data.aws_acm_certificate.wildcard_website.arn
   depends_on = [
