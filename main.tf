@@ -594,7 +594,7 @@ resource "aws_alb_listener" "listener_load_balancer" {
   port              = "443"
   protocol          = "HTTPS"
   
-
+  ssl_policy = "ELBSecurityPolicy-2016–08"
   certificate_arn = data.aws_acm_certificate.wildcard_website.arn
 
   default_action {
@@ -609,16 +609,17 @@ resource "aws_alb_listener" "listener_load_balancer" {
 }
 
 # We setup ssl
-resource "aws_lb_listener_certificate" "ourservice_ssl_cert" {
-  provider = aws.us-east-1 
-  listener_arn    = aws_alb_listener.listener_load_balancer.arn
-  certificate_arn = data.aws_acm_certificate.wildcard_website.arn
-  depends_on = [
-    aws_acm_certificate.wildcard_website,
-    aws_alb_listener.listener_load_balancer
-  ] 
+#resource "aws_lb_listener_certificate" "ourservice_ssl_cert" {
+  #provider = aws.us-east-1 
+  #listener_arn    = aws_alb_listener.listener_load_balancer.arn
+  #certificate_arn = data.aws_acm_certificate.wildcard_website.arn
+  #depends_on = [
+    #aws_acm_certificate.wildcard_website,
+    #aws_alb_listener.listener_load_balancer
+  #] 
    
-}
+#}
+
 
 # We create a security group for our wordpress instance
 resource "aws_security_group" "security_group_wordpress" {
