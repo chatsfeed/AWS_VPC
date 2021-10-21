@@ -82,7 +82,6 @@ resource "aws_acm_certificate" "wildcard_website" {
 resource "aws_acm_certificate_validation" "wildcard_cert" {
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.wildcard_website.arn
-  validation_record_fqdns = [aws_route53_record.cert_validation.fqdn] 
 }
 
 
