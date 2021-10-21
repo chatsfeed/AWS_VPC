@@ -528,19 +528,12 @@ resource "aws_security_group" "sg_load_balancer" {
     cidr_blocks = ["0.0.0.0/0"]
   } 
 
- # Outbound internet access
+ # Outbound all traffic
   egress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [var.public_subnet_1_CIDR]
-  }
-
-  egress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [var.public_subnet_2_CIDR]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
@@ -587,6 +580,23 @@ resource "aws_alb" "load_balancer" {
   ]
 }
 
+
+# We create a listener for our application load balancer
+resource "aws_alb_listener" "listener_load_balancer_http" {
+  load_balancer_arn = aws_alb.load_balancer.id
+  port              = "80"
+  protocol          = "HTTP"
+  
+  default_action {
+    target_group_arn = aws_alb_target_group.tg_load_balancer.id
+    type = "forward"
+  }
+
+  depends_on = [
+    aws_alb.load_balancer,
+    aws_alb_target_group.tg_load_balancer
+  ]
+}
 
 # We create a listener for our application load balancer
 resource "aws_alb_listener" "listener_load_balancer" {
