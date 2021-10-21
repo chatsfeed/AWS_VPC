@@ -110,7 +110,7 @@ data "aws_acm_certificate" "wildcard_website" {
 resource "aws_route53_record" "website_alb_root_record" {
   #zone_id = data.aws_route53_zone.wildcard_website.zone_id
   zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = var.www-website-domain
+  name    = var.website-domain
   type    = "A"
 
   alias {
@@ -581,7 +581,7 @@ resource "aws_alb" "load_balancer" {
 }
 
 
-# We create a listener for our application load balancer
+# We create an http listener for our application load balancer
 resource "aws_alb_listener" "listener_load_balancer_http" {
   load_balancer_arn = aws_alb.load_balancer.id
   port              = "80"
@@ -598,15 +598,16 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
   ]
 }
 
-# We create a listener for our application load balancer
+# We create an https listener for our application load balancer
 resource "aws_alb_listener" "listener_load_balancer" {
   load_balancer_arn = aws_alb.load_balancer.id
   port              = "443"
   protocol          = "HTTPS"
   
   ssl_policy = "ELBSecurityPolicy-2016–08"
-  certificate_arn = data.aws_acm_certificate.wildcard_website.arn
-
+  #certificate_arn = data.aws_acm_certificate.wildcard_website.arn
+  certificate_arn = aws_acm_certificate_validation.wildcard_cert.certificate_arn
+   
   default_action {
     target_group_arn = aws_alb_target_group.tg_load_balancer.id
     type = "forward"
