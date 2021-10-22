@@ -650,7 +650,18 @@ resource "aws_security_group" "sg_load_balancer" {
 
 
 # We create a target group for our application load balancer
-resource "aws_alb_target_group" "tg_load_balancer" {
+resource "aws_alb_target_group" "tg_load_balancer_http" {
+  name     = "target-group-load-balancer"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.vpc.id
+
+  depends_on = [
+    aws_vpc.vpc
+  ]
+}
+
+resource "aws_alb_target_group" "tg_load_balancer_https" {
   name     = "target-group-load-balancer"
   port     = 443
   protocol = "HTTPS"
@@ -660,7 +671,6 @@ resource "aws_alb_target_group" "tg_load_balancer" {
     aws_vpc.vpc
   ]
 }
-
 
 # We create our application load balancer
 resource "aws_alb" "load_balancer" {
@@ -685,7 +695,7 @@ resource "aws_alb" "load_balancer" {
 
 
 # We create an http listener for our application load balancer
-resource "aws_alb_listener" "listener_load_balancer_http" {
+resource "aws_alb_listener" "listener_load_balancer" {
   load_balancer_arn = aws_alb.load_balancer.id
   port              = "80"
   protocol          = "HTTP"
@@ -723,7 +733,7 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
 
   depends_on = [
     aws_alb.load_balancer,
-    aws_alb_target_group.tg_load_balancer
+    aws_alb_target_group.tg_load_balancer_https
   ]
 }
 
@@ -800,6 +810,14 @@ resource "aws_security_group" "security_group_wordpress" {
    
   ingress {
     description = "allow TCP"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.public_subnet_1_CIDR, var.public_subnet_2_CIDR]   
+  } 
+   
+  ingress {
+    description = "allow TCP"
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
@@ -837,7 +855,7 @@ resource "aws_launch_configuration" "wordpress_instance" {
             systemctl restart docker
             systemctl enable docker
             docker pull wordpress
-            docker run --name wordpress -p 80:80 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
+            docker run --name wordpress -p 80:80 -p 443:443 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
             -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=root -e WORDPRESS_DB_NAME=wordpressdb -d wordpress
   EOF
 
