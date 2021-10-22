@@ -721,6 +721,56 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
 #}
 
 
+# We create a security group for our mysql instance
+resource "aws_security_group" "sg_mysql" {
+  depends_on = [
+    aws_vpc.vpc,
+  ]
+  name        = "sg mysql"
+  description = "Allow mysql inbound traffic"
+  vpc_id      = aws_vpc.vpc.id
+
+  ingress {
+    description = "allow TCP"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    security_groups = [aws_security_group.sg_wordpress.id]
+  }
+
+  ingress {
+    description = "allow SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_eip.bastion_elastic_ip_1.public_ip}/32", "${aws_eip.bastion_elastic_ip_2.public_ip}/32"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# We create our mysql instance in the private subnet
+resource "aws_instance" "mysql" {
+  depends_on = [
+    aws_security_group.sg_mysql,
+    aws_nat_gateway.nat_gateway_1,
+    aws_route_table_association.associate_routetable_to_private_subnet_1,
+  ]
+  ami = "ami-077e31c4939f6a2f3"
+  instance_type = "t2.micro"
+  key_name = aws_key_pair.public_ssh_key.key_name
+  vpc_security_group_ids = [aws_security_group.sg_mysql.id]
+  subnet_id = aws_subnet.private_subnet_1.id
+  user_data = file("configure_mysql.sh")
+  tags = {
+      Name = "mysql-instance"
+  }
+}
 
 
 # We create a security group for our wordpress instance
