@@ -125,7 +125,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
       # HTTP Only is the default setting when the origin is an Amazon S3 static website hosting endpoint
       # This is because Amazon S3 doesn’t support HTTPS connections for static website hosting endpoints. 
       origin_protocol_policy = "https-only"
-      #http_port            = 80
+      http_port            = 80
       https_port           = 443
       origin_ssl_protocols = ["TLSv1.2", "TLSv1.1", "TLSv1"]
     }
