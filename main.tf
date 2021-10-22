@@ -579,7 +579,7 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
   load_balancer_arn = aws_alb.load_balancer.id
   port              = "80"
   protocol          = "HTTP"
-  
+   
   default_action {
     target_group_arn = aws_alb_target_group.tg_load_balancer.id
     type = "forward"
@@ -597,8 +597,9 @@ resource "aws_alb_listener" "listener_load_balancer" {
   port              = "443"
   protocol          = "HTTPS"
   
-  ssl_policy = "ELBSecurityPolicy-2016-08"
-  certificate_arn = data.aws_acm_certificate.wildcard_website.arn
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  # Default certificate
+  certificate_arn   = aws_acm_certificate_validation.wildcard_cert.certificate_arn
    
   default_action {
     target_group_arn = aws_alb_target_group.tg_load_balancer.id
@@ -611,7 +612,7 @@ resource "aws_alb_listener" "listener_load_balancer" {
   ]
 }
 
-# We setup ssl
+# Additional certificate 
 #resource "aws_lb_listener_certificate" "ourservice_ssl_cert" {
   #provider = aws.us-east-1 
   #listener_arn    = aws_alb_listener.listener_load_balancer.arn
