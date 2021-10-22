@@ -735,7 +735,7 @@ resource "aws_security_group" "sg_mysql" {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    security_groups = [aws_security_group.sg_wordpress.id]
+    security_groups = [aws_security_group.security_group_wordpress.id]
   }
 
   ingress {
