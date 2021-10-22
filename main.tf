@@ -714,7 +714,7 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
   
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   # Default certificate
-  certificate_arn   = data.aws_acm_certificate_validation.wildcard_cert.arn #aws_acm_certificate_validation.wildcard_cert.certificate_arn
+  certificate_arn   = data.aws_acm_certificate.wildcard_website.arn
    
   default_action {
     target_group_arn = aws_alb_target_group.tg_load_balancer.id
