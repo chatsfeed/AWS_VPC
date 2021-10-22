@@ -140,7 +140,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
   }
 
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    allowed_methods  = ["GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "DELETE"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     # This needs to match the `origin_id` above 
     target_origin_id = aws_alb.load_balancer.id 
@@ -149,7 +149,8 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
     max_ttl          = "1200"
 
     # Redirects any HTTP request to HTTPS 
-    viewer_protocol_policy = "redirect-to-https" 
+    #viewer_protocol_policy = "redirect-to-https" 
+    viewer_protocol_policy = "allow-all" 
     compress               = true
 
     forwarded_values {
