@@ -124,7 +124,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
       # The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
       # HTTP Only is the default setting when the origin is an Amazon S3 static website hosting endpoint
       # This is because Amazon S3 doesn’t support HTTPS connections for static website hosting endpoints. 
-      origin_protocol_policy = "https-only"
+      origin_protocol_policy = "http-only"
       http_port            = 80
       https_port           = 443
       origin_ssl_protocols = ["TLSv1.2", "TLSv1.1", "TLSv1"]
@@ -198,7 +198,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
 resource "aws_route53_record" "website_cdn_root_record" {
   #zone_id = data.aws_route53_zone.wildcard_website.zone_id
   zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = var.www-website-domain
+  name    = var.website-domain
   type    = "A"
 
   alias {
