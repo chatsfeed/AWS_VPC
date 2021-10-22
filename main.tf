@@ -198,7 +198,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
 resource "aws_route53_record" "website_cdn_root_record" {
   #zone_id = data.aws_route53_zone.wildcard_website.zone_id
   zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = var.website-domain
+  name    = var.www-website-domain
   type    = "A"
 
   alias {
