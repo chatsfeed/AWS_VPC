@@ -773,6 +773,18 @@ resource "aws_launch_configuration" "wordpress_instance" {
   key_name      = aws_key_pair.public_ssh_key.key_name
   security_groups = [aws_security_group.security_group_wordpress.id]
 
+   user_data = <<EOF
+            #! /bin/bash
+            yum update
+            yum install docker -y
+            systemctl restart docker
+            systemctl enable docker
+            docker pull wordpress
+            docker run --name wordpress -p 80:80 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
+            -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=root -e WORDPRESS_DB_NAME=wordpressdb -d wordpress
+  EOF
+
+
   lifecycle {
     create_before_destroy = true
   }
