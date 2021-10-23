@@ -697,7 +697,6 @@ resource "aws_alb" "load_balancer" {
 # We create an http listener for our application load balancer
 resource "aws_alb_listener" "listener_load_balancer_http" {
   load_balancer_arn = aws_alb.load_balancer.arn
-  provider                = aws.us-east-1 
   port              = "80"
   protocol          = "HTTP"
   
@@ -760,7 +759,6 @@ data "aws_acm_certificate" "wildcard_website_alb" {
 # We create an https listener for our application load balancer
 resource "aws_alb_listener" "listener_load_balancer_https" {
   load_balancer_arn = aws_alb.load_balancer.arn
-  provider                = aws.us-east-1 
   port              = "443"
   protocol          = "HTTPS"
   
