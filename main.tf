@@ -124,7 +124,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
       # The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
       # HTTP Only is the default setting when the origin is an Amazon S3 static website hosting endpoint
       # This is because Amazon S3 doesn’t support HTTPS connections for static website hosting endpoints. 
-      origin_protocol_policy = "http-only"
+      origin_protocol_policy = "https-only"
       http_port            = 80
       https_port           = 443
       origin_ssl_protocols = ["SSLv3", "TLSv1.2", "TLSv1.1", "TLSv1"]
