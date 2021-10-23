@@ -717,6 +717,46 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
   ]
 }
 
+# NB: CloudFront requires the ACM certificate be in us-east-1 region. 
+# But ALB requires that the cert be in the same region as the ALB. 
+# We'll have to create an ACM certificate again for ALB.
+
+resource "aws_acm_certificate" "wildcard_website_alb" {
+  # We want a wildcard cert so we can host subdomains later.
+  domain_name       = "*.${var.website-domain}" 
+  # We also want the cert to be valid for the root domain even though we'll be redirecting to the www. domain immediately.
+  subject_alternative_names = ["${var.website-domain}"]
+  # Which method to use for validation. DNS or EMAIL are valid, NONE can be used for certificates that were imported into ACM and then into Terraform. 
+  validation_method         = "EMAIL"
+
+  # (Optional) A mapping of tags to assign to the resource. 
+  tags = merge(var.tags, {
+    ManagedBy = "terraform"
+    Changed   = formatdate("YYYY-MM-DD hh:mm ZZZ", timestamp())
+  })
+
+  lifecycle {
+    ignore_changes = [tags["Changed"]]
+  }
+
+}
+
+resource "aws_acm_certificate_validation" "wildcard_cert_alb" {
+  certificate_arn         = aws_acm_certificate.wildcard_website_alb.arn
+}
+
+
+data "aws_acm_certificate" "wildcard_website_alb" {
+  depends_on = [
+    aws_acm_certificate.wildcard_website_alb,
+    aws_acm_certificate_validation.wildcard_cert_alb,
+  ]
+
+  domain      = "*.${var.website-domain}" 
+  statuses    = ["ISSUED"]
+  most_recent = true
+}
+
 # We create an https listener for our application load balancer
 resource "aws_alb_listener" "listener_load_balancer_https" {
   load_balancer_arn = aws_alb.load_balancer.id
@@ -726,7 +766,7 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
   
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   # Default certificate
-  certificate_arn   = data.aws_acm_certificate.wildcard_website.arn
+  certificate_arn   = data.aws_acm_certificate.wildcard_website_alb.arn
    
   default_action {
     target_group_arn = aws_alb_target_group.tg_load_balancer_https.arn
