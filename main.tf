@@ -904,6 +904,7 @@ resource "aws_autoscaling_group" "auto_scaling_wordpress_az_2" {
   depends_on = [
     aws_launch_configuration.wordpress_instance,
     aws_subnet.private_subnet_2,
-    aws_alb_target_group.tg_load_balancer
+    aws_alb_target_group.tg_load_balancer_http,
+    aws_alb_target_group.tg_load_balancer_https
   ]
 }
