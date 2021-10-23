@@ -895,7 +895,7 @@ resource "aws_autoscaling_group" "auto_scaling_wordpress_az_2" {
   min_size             = 1
   max_size             = 3
   vpc_zone_identifier       = [aws_subnet.private_subnet_2.id]
-  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https]
+  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https.arn]
 
   lifecycle {
     create_before_destroy = true
