@@ -693,6 +693,18 @@ resource "aws_alb" "load_balancer" {
   ]
 }
 
+# We create an elastic IP for our load balancer
+# A static public IP address that we can assign to our bastion host
+resource "aws_eip" "load_balancer_elastic_ip_1" {
+   vpc = true
+}
+
+# We associate the elastic ip to our load balancer
+resource "aws_eip_association" "load_balancer_eip_association_1" {
+  instance_id   = aws_alb.load_balancer.id 
+  allocation_id = aws_eip.load_balancer_elastic_ip_1.id
+}
+
 
 # We create an http listener for our application load balancer
 resource "aws_alb_listener" "listener_load_balancer_http" {
