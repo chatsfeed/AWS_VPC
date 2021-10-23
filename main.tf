@@ -727,7 +727,7 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
   certificate_arn   = data.aws_acm_certificate.wildcard_website.arn
    
   default_action {
-    target_group_arn = aws_alb_target_group.tg_load_balancer.id
+    target_group_arn = aws_alb_target_group.tg_load_balancer_https.arn
     type = "forward"
   }
 
@@ -875,7 +875,7 @@ resource "aws_autoscaling_group" "auto_scaling_wordpress_az_1" {
   min_size             = 1
   max_size             = 3
   vpc_zone_identifier       = [aws_subnet.private_subnet_1.id]
-  target_group_arns         = [aws_alb_target_group.tg_load_balancer.id]
+  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https]
 
   lifecycle {
     create_before_destroy = true
@@ -884,7 +884,8 @@ resource "aws_autoscaling_group" "auto_scaling_wordpress_az_1" {
   depends_on = [
     aws_launch_configuration.wordpress_instance,
     aws_subnet.private_subnet_1,
-    aws_alb_target_group.tg_load_balancer
+    aws_alb_target_group.tg_load_balancer_http,
+    aws_alb_target_group.tg_load_balancer_https 
   ]
 }
 
@@ -894,7 +895,7 @@ resource "aws_autoscaling_group" "auto_scaling_wordpress_az_2" {
   min_size             = 1
   max_size             = 3
   vpc_zone_identifier       = [aws_subnet.private_subnet_2.id]
-  target_group_arns         = [aws_alb_target_group.tg_load_balancer.id]
+  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https]
 
   lifecycle {
     create_before_destroy = true
