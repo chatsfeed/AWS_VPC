@@ -675,6 +675,7 @@ resource "aws_alb_target_group" "tg_load_balancer_https" {
 # We create our application load balancer
 resource "aws_alb" "load_balancer" {
   name               = "load-balancer"
+  provider                = aws.us-east-1 
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_load_balancer.id]
@@ -697,6 +698,7 @@ resource "aws_alb" "load_balancer" {
 # We create an http listener for our application load balancer
 resource "aws_alb_listener" "listener_load_balancer_http" {
   load_balancer_arn = aws_alb.load_balancer.id
+  provider                = aws.us-east-1 
   port              = "80"
   protocol          = "HTTP"
   
@@ -719,6 +721,7 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
 # We create an https listener for our application load balancer
 resource "aws_alb_listener" "listener_load_balancer_https" {
   load_balancer_arn = aws_alb.load_balancer.id
+  provider                = aws.us-east-1 
   port              = "443"
   protocol          = "HTTPS"
   
