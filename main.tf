@@ -675,7 +675,6 @@ resource "aws_alb_target_group" "tg_load_balancer_https" {
 # We create our application load balancer
 resource "aws_alb" "load_balancer" {
   name               = "load-balancer"
-  provider                = aws.us-east-1 
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_load_balancer.id]
