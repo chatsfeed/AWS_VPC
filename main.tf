@@ -897,14 +897,34 @@ resource "aws_launch_configuration" "wordpress_instance" {
   security_groups = [aws_security_group.security_group_wordpress.id]
 
    user_data = <<EOF
-            #! /bin/bash
-            yum update
-            yum install docker -y
-            systemctl restart docker
-            systemctl enable docker
-            docker pull wordpress
-            docker run --name wordpress -p 443:443 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
-            -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=root -e WORDPRESS_DB_NAME=wordpressdb -d wordpress
+            # #! /bin/bash
+            #yum update
+            #yum install docker -y
+            #systemctl restart docker
+            #systemctl enable docker
+            #docker pull wordpress
+            #docker run --name wordpress -p 443:443 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
+            #-e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=root -e WORDPRESS_DB_NAME=wordpressdb -d wordpress
+   
+            #!/bin/bash
+
+# user_data scripts automatically execute as root user, 
+# so, no need to use sudo
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+apt-get update
+
+# install docker community edition
+apt-cache policy docker-ce
+apt-get install -y docker-ce
+
+# pull nginx image
+docker pull nginx:latest
+
+# run container with port mapping - host:container
+docker run -d -p 80:80 --name nginx nginx
+   
   EOF
 
 
