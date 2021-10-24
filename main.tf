@@ -718,10 +718,10 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
     #}
   #}
    
-  health_check {
-    path = "/"
-    port = 80
-  } 
+  default_action {
+    type             = "forward"
+    target_group_arn =  aws_alb_target_group.tg_load_balancer_http.arn
+  }
  
   depends_on = [
     aws_alb.load_balancer,
