@@ -930,22 +930,22 @@ resource "aws_autoscaling_group" "auto_scaling_wordpress_az_1" {
   ]
 }
 
-resource "aws_autoscaling_group" "auto_scaling_wordpress_az_2" {
-  name                 = "auto-scaling-wordpress-az-2"
-  launch_configuration = aws_launch_configuration.wordpress_instance.name
-  min_size             = 1
-  max_size             = 3
-  vpc_zone_identifier       = [aws_subnet.private_subnet_2.id]
-  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https.arn]
+#resource "aws_autoscaling_group" "auto_scaling_wordpress_az_2" {
+  #name                 = "auto-scaling-wordpress-az-2"
+  #launch_configuration = aws_launch_configuration.wordpress_instance.name
+  #min_size             = 1
+  #max_size             = 3
+  #vpc_zone_identifier       = [aws_subnet.private_subnet_2.id]
+  #target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https.arn]
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  #lifecycle {
+    #create_before_destroy = true
+  #}
 
-  depends_on = [
-    aws_launch_configuration.wordpress_instance,
-    aws_subnet.private_subnet_2,
-    aws_alb_target_group.tg_load_balancer_http,
-    aws_alb_target_group.tg_load_balancer_https
-  ]
-}
+  #depends_on = [
+    #aws_launch_configuration.wordpress_instance,
+    #aws_subnet.private_subnet_2,
+    #aws_alb_target_group.tg_load_balancer_http,
+    #aws_alb_target_group.tg_load_balancer_https
+  #]
+#}
