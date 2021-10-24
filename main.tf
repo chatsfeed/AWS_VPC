@@ -717,6 +717,11 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
       #status_code = "HTTP_301"
     #}
   #}
+   
+  health_check {
+    path = "/"
+    port = 80
+  } 
  
   depends_on = [
     aws_alb.load_balancer,
