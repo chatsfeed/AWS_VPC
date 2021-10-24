@@ -681,12 +681,13 @@ resource "aws_alb" "load_balancer" {
   subnets            = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
 
   enable_deletion_protection = false
-   
-  access_logs {
-    bucket  = aws_s3_bucket.website_logs.bucket
-    prefix  = "load-balancer-logs"
-    enabled = true
-  } 
+  
+  #getting s3 permission issues 
+  #access_logs {
+    #bucket  = aws_s3_bucket.website_logs.bucket
+    #prefix  = "load-balancer-logs"
+    #enabled = true
+  #} 
 
   tags = {
     Environment = "production"
