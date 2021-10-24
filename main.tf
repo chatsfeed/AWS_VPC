@@ -119,7 +119,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
   # Origin is where CloudFront gets its content from 
   origin {
     origin_id   = aws_alb.load_balancer.id 
-    domain_name = var.www-website-domain
+    domain_name = var.website-domain
 
     custom_origin_config {
       # The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
@@ -200,8 +200,8 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
 resource "aws_route53_record" "website_cdn_root_record" {
   #zone_id = data.aws_route53_zone.wildcard_website.zone_id
   zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = var.www-website-domain
-  type    = "CNAME"
+  name    = var.website-domain
+  type    = "A"
 
   alias {
     name = aws_cloudfront_distribution.website_cdn_root.domain_name
