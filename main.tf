@@ -681,6 +681,12 @@ resource "aws_alb" "load_balancer" {
   subnets            = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
 
   enable_deletion_protection = false
+   
+  access_logs {
+    bucket  = aws_s3_bucket.website_logs.bucket
+    prefix  = "load-balancer-logs"
+    enabled = true
+  } 
 
   tags = {
     Environment = "production"
@@ -896,7 +902,7 @@ resource "aws_launch_configuration" "wordpress_instance" {
             systemctl restart docker
             systemctl enable docker
             docker pull wordpress
-            docker run --name wordpress -p 80:80 -p 443:443 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
+            docker run --name wordpress -p 443:443 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
             -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=root -e WORDPRESS_DB_NAME=wordpressdb -d wordpress
   EOF
 
