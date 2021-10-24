@@ -3,6 +3,3 @@ output "example_name_servers" {
   value = "${aws_route53_zone.main.name_servers}"
 }
 
-output "load_balancer_public_ip" {
-  value = "${aws_alb.load_balancer.public_ip}"
-}
