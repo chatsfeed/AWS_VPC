@@ -119,7 +119,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
   # Origin is where CloudFront gets its content from 
   origin {
     origin_id   = aws_alb.load_balancer.id 
-    domain_name = var.website-domain
+    domain_name = var.www-website-domain
 
     custom_origin_config {
       # The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
