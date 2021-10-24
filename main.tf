@@ -12,11 +12,11 @@ provider "aws" {
 terraform {
   backend "s3" {
     # Replace this with your bucket name!
-    bucket         = "chatsfeed-terraform-remote-state-s3"
+    bucket         = "chatsfeed-terraform-s3-remote-state"
     key            = "terraform.tfstate"
     region  = "us-east-2"
     # Replace this with your DynamoDB table name!
-    dynamodb_table = "chatsfeed-terraform-remote-state-s3-locks"
+    dynamodb_table = "chatsfeed-terraform-dynamodb-remote-state-locks"
     encrypt        = true
   }
   # An argument named "depends_on" is not expected here
