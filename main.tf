@@ -662,6 +662,12 @@ resource "aws_alb_target_group" "tg_load_balancer_http" {
   ]
 }
 
+resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http" {
+  target_group_arn = aws_alb_target_group.tg_load_balancer_http.arn
+  target_id        = aws_instance.wordpress0.id
+  port             = 80
+}
+
 #resource "aws_alb_target_group" "tg_load_balancer_https" {
   #name     = "target-group-load-balancer-https"
   #port     = 443
@@ -721,7 +727,7 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
    
   default_action {
     type             = "forward"
-    target_group_arn =  aws_instance.wordpress0.arn #aws_alb_target_group.tg_load_balancer_http.arn
+    target_group_arn =   aws_alb_target_group.tg_load_balancer_http.arn
   }
  
   depends_on = [
