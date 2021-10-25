@@ -925,7 +925,8 @@ resource "aws_security_group" "security_group_wordpress" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [var.public_subnet_1_CIDR, var.public_subnet_2_CIDR]   
+    cidr_blocks = ["0.0.0.0/0"] 
+    #cidr_blocks = [var.public_subnet_1_CIDR, var.public_subnet_2_CIDR]   
   }
    
   ingress {
@@ -933,7 +934,8 @@ resource "aws_security_group" "security_group_wordpress" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [var.public_subnet_1_CIDR, var.public_subnet_2_CIDR]   
+    cidr_blocks = ["0.0.0.0/0"] 
+    #cidr_blocks = [var.public_subnet_1_CIDR, var.public_subnet_2_CIDR]   
   } 
    
   ingress {
@@ -963,7 +965,7 @@ resource "aws_security_group" "security_group_wordpress" {
 
 resource "aws_launch_configuration" "wordpress_instance" {
   name_prefix   = "wordpress-instance-"
-  image_id      = var.ec2_ami
+  image_id      = ami = "ami-077e31c4939f6a2f3" #var.ec2_ami
   instance_type = var.ec2_type
   key_name      = aws_key_pair.public_ssh_key.key_name
   security_groups = [aws_security_group.security_group_wordpress.id]
