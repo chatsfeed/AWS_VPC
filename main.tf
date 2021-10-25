@@ -114,7 +114,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
   # (Optional) - The price class for this distribution. One of PriceClass_All, PriceClass_200, PriceClass_100 
   price_class = "PriceClass_All"
   # (Optional) - Extra CNAMEs (alternate domain names), if any, for this distribution 
-  aliases = [var.www-website-domain, var.app-website-domain]
+  aliases = [var.website-domain, var.www-website-domain, var.app-website-domain]
 
   # Origin is where CloudFront gets its content from 
   origin {
@@ -200,8 +200,8 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
 resource "aws_route53_record" "website_cdn_root_record" {
   #zone_id = data.aws_route53_zone.wildcard_website.zone_id
   zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = var.www-website-domain
-  type    = "CNAME"
+  name    = var.website-domain
+  type    = "A"
 
   alias {
     name = aws_cloudfront_distribution.website_cdn_root.domain_name
