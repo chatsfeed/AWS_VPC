@@ -114,7 +114,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
   # (Optional) - The price class for this distribution. One of PriceClass_All, PriceClass_200, PriceClass_100 
   price_class = "PriceClass_All"
   # (Optional) - Extra CNAMEs (alternate domain names), if any, for this distribution 
-  aliases = [var.website-domain, var.www-website-domain, var.app-website-domain]
+  aliases = [var.www-website-domain, var.app-website-domain]
 
   # Origin is where CloudFront gets its content from 
   origin {
