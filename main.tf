@@ -1002,11 +1002,11 @@ resource "aws_launch_configuration" "wordpress_instance" {
 
 resource "aws_autoscaling_group" "auto_scaling_wordpress_az_1" {
   name                 = "auto-scaling-wordpress-az-1"
-  launch_configuration = aws_launch_configuration.wordpress_instance.name
+  launch_configuration = aws_launch_configuration.wordpress_instance.id
   min_size             = 1
   max_size             = 3
   vpc_zone_identifier       = [aws_subnet.private_subnet_1.id]
-  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https.arn]
+  #target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https.arn]
 
   lifecycle {
     create_before_destroy = true
@@ -1015,8 +1015,8 @@ resource "aws_autoscaling_group" "auto_scaling_wordpress_az_1" {
   depends_on = [
     aws_launch_configuration.wordpress_instance,
     aws_subnet.private_subnet_1,
-    aws_alb_target_group.tg_load_balancer_http,
-    aws_alb_target_group.tg_load_balancer_https 
+    #aws_alb_target_group.tg_load_balancer_http,
+    #aws_alb_target_group.tg_load_balancer_https 
   ]
 }
 
@@ -1039,16 +1039,6 @@ resource "aws_autoscaling_group" "auto_scaling_wordpress_az_1" {
     #aws_alb_target_group.tg_load_balancer_https
   #]
 #}
-
-
-
-
-
-
-
-
-
-
 
 
 
