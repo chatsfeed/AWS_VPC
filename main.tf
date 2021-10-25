@@ -99,7 +99,7 @@ data "aws_acm_certificate" "wildcard_website" {
   ]
 
   # (Required) The domain of the certificate to look up 
-  domain      = "*.${var.website-domain}" #var.www-website-domain 
+  domain      = "${var.website-domain}"  #"*.${var.website-domain}" 
   # (Optional) A list of statuses on which to filter the returned list. Default is ISSUED if no value is specified
   # Valid values are PENDING_VALIDATION, ISSUED, INACTIVE, EXPIRED, VALIDATION_TIMED_OUT, REVOKED and FAILED 
   statuses    = ["ISSUED"]
