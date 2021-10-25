@@ -686,18 +686,18 @@ resource "aws_alb_target_group" "tg_load_balancer_https" {
   ]
 }
 
-#resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https" {
-  #target_group_arn = aws_alb_target_group.tg_load_balancer_https.arn
-  #target_id        = aws_autoscaling_group.auto_scaling_wordpress_az_1.id #aws_instance.wordpress0.id
-  #port             = 443
-#}
+resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https" {
+  target_group_arn = aws_alb_target_group.tg_load_balancer_https.arn
+  target_id        = aws_instance.wordpress0.id
+  port             = 443
+}
 
 
 # Create a new ALB Target Group attachment
-resource "aws_autoscaling_attachment" "asg_alb_attachment_https" {
-  autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
-  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https.arn
-}
+#resource "aws_autoscaling_attachment" "asg_alb_attachment_https" {
+  #autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
+  #alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https.arn
+#}
 
 
 # We create our application load balancer
