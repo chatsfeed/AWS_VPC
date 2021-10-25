@@ -210,6 +210,34 @@ resource "aws_route53_record" "website_cdn_root_record" {
   }
 }
 
+# Creates the DNS record to point on the main CloudFront distribution ID
+resource "aws_route53_record" "website_cdn_root_record" {
+  #zone_id = data.aws_route53_zone.wildcard_website.zone_id
+  zone_id = "${aws_route53_zone.main.zone_id}"
+  name    = var.www-website-domain
+  type    = "CNAME"
+
+  alias {
+    name = aws_cloudfront_distribution.website_cdn_root.domain_name
+    zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+
+# Creates the DNS record to point on the main CloudFront distribution ID
+resource "aws_route53_record" "website_cdn_root_record" {
+  #zone_id = data.aws_route53_zone.wildcard_website.zone_id
+  zone_id = "${aws_route53_zone.main.zone_id}"
+  name    = var.app-website-domain
+  type    = "CNAME"
+
+  alias {
+    name = aws_cloudfront_distribution.website_cdn_root.domain_name
+    zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
 
 
 # Creates bucket to store logs
