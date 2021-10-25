@@ -662,17 +662,17 @@ resource "aws_alb_target_group" "tg_load_balancer_http" {
   ]
 }
 
-#resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http" {
-  #target_group_arn = aws_alb_target_group.tg_load_balancer_http.arn
-  #target_id        = aws_autoscaling_group.auto_scaling_wordpress_az_1.id #aws_instance.wordpress0.id
-  #port             = 80
-#}
+resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http" {
+  target_group_arn = aws_alb_target_group.tg_load_balancer_http.arn
+  target_id        = aws_instance.wordpress0.id
+  port             = 80
+}
 
 # Create a new ALB Target Group attachment
-resource "aws_autoscaling_attachment" "asg_alb_attachment_http" {
-  autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
-  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_http.arn
-}
+#resource "aws_autoscaling_attachment" "asg_alb_attachment_http" {
+  #autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
+  #alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_http.arn
+#}
 
 
 resource "aws_alb_target_group" "tg_load_balancer_https" {
