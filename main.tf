@@ -767,10 +767,11 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_http.id}"  
   }  
    
-    condition {
-    field  = "host-header"
-    values = ["${var.www-website-domain}"]
-  }
+  condition {
+    host_header {
+      values = ["${var.www-website-domain}"]
+    }
+ }
    
 }
 
@@ -847,10 +848,11 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_https" {
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_https.id}"  
   }  
    
-    condition {
-    field  = "host-header"
-    values = ["${var.www-website-domain}"]
-  }
+  condition {
+    host_header {
+      values = ["${var.www-website-domain}"]
+    }
+ }
    
 }
 
