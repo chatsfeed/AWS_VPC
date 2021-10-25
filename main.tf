@@ -53,9 +53,9 @@ resource "aws_acm_certificate" "wildcard_website" {
   # We refer to the aliased provider ( ${provider_name}.${alias} ) for creating our ACM resource. 
   provider                  = aws.us-east-1
   # We want a wildcard cert so we can host subdomains later.
-  domain_name       = "*.${var.website-domain}" 
+  domain_name       =  "${var.website-domain}"
   # We also want the cert to be valid for the root domain even though we'll be redirecting to the www. domain immediately.
-  subject_alternative_names = ["${var.website-domain}"]
+  subject_alternative_names = ["*.${var.website-domain}"]
   # Which method to use for validation. DNS or EMAIL are valid, NONE can be used for certificates that were imported into ACM and then into Terraform. 
   validation_method         = "EMAIL"
 
