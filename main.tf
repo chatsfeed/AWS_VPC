@@ -757,6 +757,25 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
   ]
 }
 
+resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
+  depends_on   = [aws_alb_target_group.tg_load_balancer_http]  
+  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
+  priority     = 100   
+  action {    
+    type             = "forward"    
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_http.id}"  
+  }   
+  condition {    
+    #field  = "path-pattern"    
+    #values = ["${var.alb_path}"]  
+    host_header {
+    values = ["${var.www-website-domain}"] 
+  }
+
+}
+
+
+
 # NB: CloudFront requires the ACM certificate be in us-east-1 region. 
 # But ALB requires that the cert be in the same region as the ALB. 
 # We'll have to create an ACM certificate again for ALB.
