@@ -217,11 +217,14 @@ resource "aws_route53_record" "website_cdn_www_record" {
   name    = var.www-website-domain
   type    = "CNAME"
 
-  alias {
-    name = aws_cloudfront_distribution.website_cdn_root.domain_name
-    zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
-    evaluate_target_health = false
-  }
+  set_identifier = "www"
+  records        = [var.www-website-domain]
+   
+  #alias {
+    #name = aws_cloudfront_distribution.website_cdn_root.domain_name
+    #zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
+    #evaluate_target_health = false
+  #}
 }
 
 
@@ -232,11 +235,14 @@ resource "aws_route53_record" "website_cdn_app_record" {
   name    = var.app-website-domain
   type    = "CNAME"
 
-  alias {
-    name = aws_cloudfront_distribution.website_cdn_root.domain_name
-    zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
-    evaluate_target_health = false
-  }
+  set_identifier = "app"
+  records        = [var.app-website-domain]   
+   
+  #alias {
+    #name = aws_cloudfront_distribution.website_cdn_root.domain_name
+    #zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
+    #evaluate_target_health = false
+  #}
 }
 
 
