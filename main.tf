@@ -211,7 +211,7 @@ resource "aws_route53_record" "website_cdn_root_record" {
 }
 
 # Creates the DNS record to point on the main CloudFront distribution ID
-resource "aws_route53_record" "website_cdn_root_record" {
+resource "aws_route53_record" "website_cdn_www_record" {
   #zone_id = data.aws_route53_zone.wildcard_website.zone_id
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = var.www-website-domain
@@ -226,7 +226,7 @@ resource "aws_route53_record" "website_cdn_root_record" {
 
 
 # Creates the DNS record to point on the main CloudFront distribution ID
-resource "aws_route53_record" "website_cdn_root_record" {
+resource "aws_route53_record" "website_cdn_app_record" {
   #zone_id = data.aws_route53_zone.wildcard_website.zone_id
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = var.app-website-domain
