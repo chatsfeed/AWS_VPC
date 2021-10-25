@@ -662,17 +662,18 @@ resource "aws_alb_target_group" "tg_load_balancer_http" {
   ]
 }
 
-resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http" {
-  target_group_arn = aws_alb_target_group.tg_load_balancer_http.arn
-  target_id        = aws_autoscaling_group.auto_scaling_wordpress_az_1.id #aws_instance.wordpress0.id
-  port             = 80
-}
+#resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http" {
+  #target_group_arn = aws_alb_target_group.tg_load_balancer_http.arn
+  #target_id        = aws_autoscaling_group.auto_scaling_wordpress_az_1.id #aws_instance.wordpress0.id
+  #port             = 80
+#}
 
 # Create a new ALB Target Group attachment
-#resource "aws_autoscaling_attachment" "asg_alb_attachment_http" {
-  #autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
-  #alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_http.arn
-#}
+resource "aws_autoscaling_attachment" "asg_alb_attachment_http" {
+  autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
+  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_http.arn
+}
+
 
 resource "aws_alb_target_group" "tg_load_balancer_https" {
   name     = "target-group-load-balancer-https"
@@ -685,18 +686,18 @@ resource "aws_alb_target_group" "tg_load_balancer_https" {
   ]
 }
 
-resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https" {
-  target_group_arn = aws_alb_target_group.tg_load_balancer_https.arn
-  target_id        = aws_autoscaling_group.auto_scaling_wordpress_az_1.id #aws_instance.wordpress0.id
-  port             = 443
-}
+#resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https" {
+  #target_group_arn = aws_alb_target_group.tg_load_balancer_https.arn
+  #target_id        = aws_autoscaling_group.auto_scaling_wordpress_az_1.id #aws_instance.wordpress0.id
+  #port             = 443
+#}
 
 
 # Create a new ALB Target Group attachment
-#resource "aws_autoscaling_attachment" "asg_alb_attachment_https" {
-  #autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
-  #alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https.arn
-#}
+resource "aws_autoscaling_attachment" "asg_alb_attachment_https" {
+  autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
+  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https.arn
+}
 
 
 # We create our application load balancer
@@ -938,24 +939,13 @@ resource "aws_launch_configuration" "wordpress_instance" {
             #docker run --name wordpress -p 443:443 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
             #-e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=root -e WORDPRESS_DB_NAME=wordpressdb -d wordpress
    
-            #!/bin/bash
-
-# user_data scripts automatically execute as root user, 
-# so, no need to use sudo
-
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-apt-get update
-
-# install docker community edition
-apt-cache policy docker-ce
-apt-get install -y docker-ce
-
-# pull nginx image
-docker pull nginx:latest
-
-# run container with port mapping - host:container
-docker run -d -p 80:80 -p 443:443 --name nginx nginx
+            #! /bin/bash
+            yum update
+            yum install docker -y
+            systemctl restart docker
+            systemctl enable docker
+            docker pull nginx
+            docker run --name mynginx1 -p 80:80 -p 443:443 -d nginx
    
   EOF
 
@@ -975,7 +965,7 @@ resource "aws_autoscaling_group" "auto_scaling_wordpress_az_1" {
   min_size             = 1
   max_size             = 3
   vpc_zone_identifier       = [aws_subnet.private_subnet_1.id]
-  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn] #, aws_alb_target_group.tg_load_balancer_https.arn]
+  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https.arn]
 
   lifecycle {
     create_before_destroy = true
@@ -985,7 +975,7 @@ resource "aws_autoscaling_group" "auto_scaling_wordpress_az_1" {
     aws_launch_configuration.wordpress_instance,
     aws_subnet.private_subnet_1,
     aws_alb_target_group.tg_load_balancer_http,
-    #aws_alb_target_group.tg_load_balancer_https 
+    aws_alb_target_group.tg_load_balancer_https 
   ]
 }
 
