@@ -669,7 +669,7 @@ resource "aws_alb_target_group" "tg_load_balancer_http" {
 #}
 
 # Create a new ALB Target Group attachment
-resource "aws_autoscaling_attachment" "asg_alb_attachment" {
+resource "aws_autoscaling_attachment" "asg_alb_attachment_http" {
   autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
   alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_http.arn
 }
@@ -693,7 +693,7 @@ resource "aws_alb_target_group" "tg_load_balancer_https" {
 
 
 # Create a new ALB Target Group attachment
-resource "aws_autoscaling_attachment" "asg_alb_attachment" {
+resource "aws_autoscaling_attachment" "asg_alb_attachment_https" {
   autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
   alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https.arn
 }
