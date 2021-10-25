@@ -219,7 +219,9 @@ resource "aws_route53_record" "website_cdn_www_record" {
 
   set_identifier = "www"
   records        = [var.www-website-domain]
-   
+
+  ttl = 1800
+ 
   #alias {
     #name = aws_cloudfront_distribution.website_cdn_root.domain_name
     #zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
@@ -237,6 +239,9 @@ resource "aws_route53_record" "website_cdn_app_record" {
 
   set_identifier = "app"
   records        = [var.app-website-domain]   
+   
+  ttl = 1800
+ 
    
   #alias {
     #name = aws_cloudfront_distribution.website_cdn_root.domain_name
