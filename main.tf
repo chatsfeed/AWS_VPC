@@ -117,20 +117,33 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
   aliases = [var.website-domain, var.www-website-domain, var.app-website-domain]
 
   # Origin is where CloudFront gets its content from 
-  origin {
-    origin_id   = aws_alb.load_balancer.id 
-    domain_name = var.website-domain
+  #origin {
+    #origin_id   = aws_alb.load_balancer.id 
+    #domain_name = var.website-domain
 
+    #custom_origin_config {
+      ## The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
+      ## HTTP Only is the default setting when the origin is an Amazon S3 static website hosting endpoint
+      ## This is because Amazon S3 doesn’t support HTTPS connections for static website hosting endpoints. 
+      #origin_protocol_policy = "match-viewer"
+      #http_port            = 80
+      #https_port           = 443
+      #origin_ssl_protocols = ["SSLv3", "TLSv1.2", "TLSv1.1", "TLSv1"]
+    #}
+  #}
+   
+  origin {
+    domain_name = aws_s3_bucket.apex_domain_redirect_bucket.website_endpoint
+    origin_id   = "apex-domain-cloudfront-origin"
+ 
     custom_origin_config {
-      # The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
-      # HTTP Only is the default setting when the origin is an Amazon S3 static website hosting endpoint
-      # This is because Amazon S3 doesn’t support HTTPS connections for static website hosting endpoints. 
-      origin_protocol_policy = "match-viewer"
-      http_port            = 80
-      https_port           = 443
-      origin_ssl_protocols = ["SSLv3", "TLSv1.2", "TLSv1.1", "TLSv1"]
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.1"]
     }
-  }
+  } 
+   
 
   #optional 
   #default_root_object = "index.html"
@@ -144,7 +157,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
     allowed_methods  = ["GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "DELETE"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     # This needs to match the `origin_id` above 
-    target_origin_id = aws_alb.load_balancer.id 
+    target_origin_id = "apex-domain-cloudfront-origin"  #aws_alb.load_balancer.id 
     min_ttl          = "0"
     default_ttl      = "300"
     max_ttl          = "1200"
@@ -242,6 +255,15 @@ resource "aws_route53_record" "website_cdn_root_record" {
     #evaluate_target_health = false
   #}
 #}
+
+# bucket to redirect apex record to cname
+resource "aws_s3_bucket" "apex_domain_redirect_bucket" {
+  bucket = var.website-domain
+  acl    = "public-read"
+  website {
+    redirect_all_requests_to = "https://${var.www-website-domain}"
+  }
+}
 
 
 # Creates bucket to store logs
