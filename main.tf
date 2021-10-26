@@ -801,7 +801,7 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
    
   condition {
     host_header {
-      values = ["${var.www-website-domain}"]
+      values = [var.website-domain, var.www-website-domain, var.app-website-domain] #["${var.www-website-domain}"]
     }
  }
    
