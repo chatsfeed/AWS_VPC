@@ -224,20 +224,20 @@ resource "aws_route53_record" "website_cdn_root_record" {
 }
 
 # Creates the DNS record to point on the main CloudFront distribution ID
-#resource "aws_route53_record" "website_cdn_www_record" {
-  ##zone_id = data.aws_route53_zone.wildcard_website.zone_id
-  #zone_id = "${aws_route53_zone.main.zone_id}"
-  #name    = "www"
-  #type    = "CNAME"
-  #records        = [var.website-domain]
-  #ttl = 1800
+resource "aws_route53_record" "website_cdn_www_record" {
+  #zone_id = data.aws_route53_zone.wildcard_website.zone_id
+  zone_id = "${aws_route53_zone.main.zone_id}"
+  name    = "www"
+  type    = "CNAME"
+  records        = [var.www-website-domain]
+  ttl = 1800
  
-  #alias {
-    #name = aws_cloudfront_distribution.website_cdn_root.domain_name
-    #zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
-    #evaluate_target_health = false
-  #}
-#}
+  alias {
+    name = aws_cloudfront_distribution.website_cdn_root.domain_name
+    zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
 
 
 # Creates the DNS record to point on the main CloudFront distribution ID
