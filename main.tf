@@ -114,27 +114,13 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
   # (Optional) - The price class for this distribution. One of PriceClass_All, PriceClass_200, PriceClass_100 
   price_class = "PriceClass_All"
   # (Optional) - Extra CNAMEs (alternate domain names), if any, for this distribution 
-  aliases = [var.www-website-domain]
+  # The aliases define the domain names (hosts) that the distribution will accept requests for 
+  aliases = [var.website-domain, var.www-website-domain, var.app-website-domain]
 
   # Origin is where CloudFront gets its content from 
-  #origin {
-    #origin_id   = aws_alb.load_balancer.id 
-    #domain_name = var.website-domain
-
-    #custom_origin_config {
-      ## The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
-      ## HTTP Only is the default setting when the origin is an Amazon S3 static website hosting endpoint
-      ## This is because Amazon S3 doesn’t support HTTPS connections for static website hosting endpoints. 
-      #origin_protocol_policy = "match-viewer"
-      #http_port            = 80
-      #https_port           = 443
-      #origin_ssl_protocols = ["SSLv3", "TLSv1.2", "TLSv1.1", "TLSv1"]
-    #}
-  #}
-   
   origin {
     domain_name = aws_alb.load_balancer.dns_name #aws_s3_bucket.apex_domain_redirect_bucket.website_endpoint
-    origin_id   = "apex-domain-cloudfront-origin"
+    origin_id   = aws_alb.load_balancer.id  #"alb-load-balancer"
  
     custom_origin_config {
       http_port              = 80
@@ -157,7 +143,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
     allowed_methods  = ["GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "DELETE"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     # This needs to match the `origin_id` above 
-    target_origin_id = "apex-domain-cloudfront-origin"  #aws_alb.load_balancer.id 
+    target_origin_id = aws_alb.load_balancer.id 
     min_ttl          = "0"
     default_ttl      = "300"
     max_ttl          = "1200"
@@ -216,41 +202,6 @@ resource "aws_route53_record" "website_cdn_root_record" {
     evaluate_target_health = false
   }
 }
-
-
-
-## Creates the DNS record to point on the main CloudFront distribution ID
-#resource "aws_route53_record" "website_cdn_www_record" {
-  ##zone_id = data.aws_route53_zone.wildcard_website.zone_id
-  #zone_id = "${aws_route53_zone.main.zone_id}"
-  #name    = "www"
-  #type    = "CNAME"
-  #records        = [var.www-website-domain]
-  #ttl = 1800
- 
-  #alias {
-    #name = aws_alb.load_balancer.dns_name #aws_cloudfront_distribution.website_cdn_root.domain_name
-    #zone_id = aws_alb.load_balancer.zone_id #aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
-    #evaluate_target_health = false
-  #}
-#}
-
-
-# Creates the DNS record to point on the main CloudFront distribution ID
-#resource "aws_route53_record" "website_cdn_app_record" {
-  ##zone_id = data.aws_route53_zone.wildcard_website.zone_id
-  #zone_id = "${aws_route53_zone.main.zone_id}"
-  #name    = "app"
-  #type    = "CNAME"
-  #records        = [var.website-domain]   
-  #ttl = 1800
-   
-  #alias {
-    #name = aws_cloudfront_distribution.website_cdn_root.domain_name
-    #zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
-    #evaluate_target_health = false
-  #}
-#}
 
 
 ##https://engineering.resolvergroup.com/2020/06/how-to-redirect-an-apex-domain-to-www-using-cloudfront-and-s3/
