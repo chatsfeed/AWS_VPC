@@ -797,6 +797,42 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
 }
 
 
+resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_http" {
+  depends_on   = [aws_alb_target_group.tg_load_balancer_http]  
+  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
+  priority     = 100   
+  action {    
+    type             = "forward"    
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_http.id}"  
+  }  
+   
+  condition {
+    host_header {
+      values = [var.website-domain] 
+    }
+ }
+   
+}
+
+
+resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_http" {
+  depends_on   = [aws_alb_target_group.tg_load_balancer_http]  
+  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
+  priority     = 100   
+  action {    
+    type             = "forward"    
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_http.id}"  
+  }  
+   
+  condition {
+    host_header {
+      values = [var.app-website-domain] 
+    }
+ }
+   
+}
+
+
 
 # NB: CloudFront requires the ACM certificate be in us-east-1 region. 
 # But ALB requires that the cert be in the same region as the ALB. 
@@ -877,6 +913,42 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_https" {
    
 }
 
+
+resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_https" {
+  depends_on   = [aws_alb_target_group.tg_load_balancer_https]  
+  listener_arn = aws_alb_listener.listener_load_balancer_https.arn
+  priority     = 100   
+  action {    
+    type             = "forward"    
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https.id}"  
+  }  
+   
+  condition {
+    host_header {
+      values = ["${var.website-domain}"]
+    }
+ }
+   
+}
+
+
+
+resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_https" {
+  depends_on   = [aws_alb_target_group.tg_load_balancer_https]  
+  listener_arn = aws_alb_listener.listener_load_balancer_https.arn
+  priority     = 100   
+  action {    
+    type             = "forward"    
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https.id}"  
+  }  
+   
+  condition {
+    host_header {
+      values = ["${var.app-website-domain}"]
+    }
+ }
+   
+}
 
 
 # We create a security group for our mysql instance
