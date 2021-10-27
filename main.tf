@@ -133,7 +133,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
   #}
    
   origin {
-    domain_name = aws_s3_bucket.apex_domain_redirect_bucket.website_endpoint
+    domain_name = aws_alb.load_balancer.dns_name #aws_s3_bucket.apex_domain_redirect_bucket.website_endpoint
     origin_id   = "apex-domain-cloudfront-origin"
  
     custom_origin_config {
@@ -223,21 +223,23 @@ resource "aws_route53_record" "website_cdn_root_record" {
   }
 }
 
-# Creates the DNS record to point on the main CloudFront distribution ID
-resource "aws_route53_record" "website_cdn_www_record" {
-  #zone_id = data.aws_route53_zone.wildcard_website.zone_id
-  zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = "www"
-  type    = "CNAME"
-  records        = [var.www-website-domain]
-  ttl = 1800
+
+#https://engineering.resolvergroup.com/2020/06/how-to-redirect-an-apex-domain-to-www-using-cloudfront-and-s3/
+## Creates the DNS record to point on the main CloudFront distribution ID
+#resource "aws_route53_record" "website_cdn_www_record" {
+  ##zone_id = data.aws_route53_zone.wildcard_website.zone_id
+  #zone_id = "${aws_route53_zone.main.zone_id}"
+  #name    = "www"
+  #type    = "CNAME"
+  #records        = [var.www-website-domain]
+  #ttl = 1800
  
-  alias {
-    name = aws_cloudfront_distribution.website_cdn_root.domain_name
-    zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
-    evaluate_target_health = false
-  }
-}
+  #alias {
+    #name = aws_cloudfront_distribution.website_cdn_root.domain_name
+    #zone_id = aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
+    #evaluate_target_health = false
+  #}
+#}
 
 
 # Creates the DNS record to point on the main CloudFront distribution ID
