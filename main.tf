@@ -232,7 +232,7 @@ resource "aws_route53_record" "website_cdn_www_record" {
   name    = "www"
   type    = "CNAME"
   records        = [var.www-website-domain]
-  ttl = 1800
+  #ttl = 1800
  
   alias {
     name = aws_alb.load_balancer.dns_name #aws_cloudfront_distribution.website_cdn_root.domain_name
