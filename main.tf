@@ -208,7 +208,7 @@ resource "aws_route53_record" "www_cname_route53_record" {
   name    = "www.chatsfeed.com" # Replace with your subdomain, Note: not valid with "apex" domains, e.g. example.com
   type    = "CNAME"
   ttl     = "60"
-  records = [aws_alb.load_balancer.dns_name]
+  records = [aws_cloudfront_distribution.website_cdn_root.domain_name] #[aws_alb.load_balancer.dns_name]
 }
 
 
@@ -217,7 +217,7 @@ resource "aws_route53_record" "app_cname_route53_record" {
   name    = "app.chatsfeed.com" # Replace with your subdomain, Note: not valid with "apex" domains, e.g. example.com
   type    = "CNAME"
   ttl     = "60"
-  records = [aws_alb.load_balancer.dns_name]
+  records = [aws_cloudfront_distribution.website_cdn_root.domain_name] #[aws_alb.load_balancer.dns_name]
 }
 
 
