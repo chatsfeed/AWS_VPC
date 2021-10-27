@@ -109,104 +109,146 @@ data "aws_acm_certificate" "wildcard_website" {
 
 ## CloudFront
 # Creates the CloudFront distribution to serve the static website
-resource "aws_cloudfront_distribution" "website_cdn_root" {
-  enabled     = true
-  # (Optional) - The price class for this distribution. One of PriceClass_All, PriceClass_200, PriceClass_100 
-  price_class = "PriceClass_All"
-  # (Optional) - Extra CNAMEs (alternate domain names), if any, for this distribution 
-  aliases = [var.website-domain, var.www-website-domain, var.app-website-domain]
+#resource "aws_cloudfront_distribution" "website_cdn_root" {
+  #enabled     = true
+  ## (Optional) - The price class for this distribution. One of PriceClass_All, PriceClass_200, PriceClass_100 
+  #price_class = "PriceClass_All"
+  ## (Optional) - Extra CNAMEs (alternate domain names), if any, for this distribution 
+  #aliases = [var.website-domain, var.www-website-domain, var.app-website-domain]
 
-  # Origin is where CloudFront gets its content from 
+  ## Origin is where CloudFront gets its content from 
+  ##origin {
+    ##origin_id   = aws_alb.load_balancer.id 
+    ##domain_name = var.website-domain
+
+    ##custom_origin_config {
+      ### The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
+      ### HTTP Only is the default setting when the origin is an Amazon S3 static website hosting endpoint
+      ### This is because Amazon S3 doesn’t support HTTPS connections for static website hosting endpoints. 
+      ##origin_protocol_policy = "match-viewer"
+      ##http_port            = 80
+      ##https_port           = 443
+      ##origin_ssl_protocols = ["SSLv3", "TLSv1.2", "TLSv1.1", "TLSv1"]
+    ##}
+  ##}
+   
   #origin {
-    #origin_id   = aws_alb.load_balancer.id 
-    #domain_name = var.website-domain
-
+    #domain_name = aws_s3_bucket.apex_domain_redirect_bucket.website_endpoint
+    #origin_id   = "apex-domain-cloudfront-origin"
+ 
     #custom_origin_config {
-      ## The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
-      ## HTTP Only is the default setting when the origin is an Amazon S3 static website hosting endpoint
-      ## This is because Amazon S3 doesn’t support HTTPS connections for static website hosting endpoints. 
-      #origin_protocol_policy = "match-viewer"
-      #http_port            = 80
-      #https_port           = 443
-      #origin_ssl_protocols = ["SSLv3", "TLSv1.2", "TLSv1.1", "TLSv1"]
+      #http_port              = 80
+      #https_port             = 443
+      #origin_protocol_policy = "http-only"
+      #origin_ssl_protocols   = ["TLSv1.1"]
+    #}
+  #} 
+   
+
+  ##optional 
+  ##default_root_object = "index.html"
+
+  #logging_config {
+    #bucket = aws_s3_bucket.website_logs.bucket_domain_name
+    #prefix = "${var.www-website-domain}/"
+  #}
+
+  #default_cache_behavior {
+    #allowed_methods  = ["GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "DELETE"]
+    #cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    ## This needs to match the `origin_id` above 
+    #target_origin_id = "apex-domain-cloudfront-origin"  #aws_alb.load_balancer.id 
+    #min_ttl          = "0"
+    #default_ttl      = "300"
+    #max_ttl          = "1200"
+
+    ## Redirects any HTTP request to HTTPS 
+    ##viewer_protocol_policy = "redirect-to-https" 
+    #viewer_protocol_policy = "allow-all" 
+    #compress               = true
+
+    #forwarded_values {
+      #query_string = false
+      #cookies {
+        #forward = "none"
+      #}
+    #}
+
+  #}
+
+  #restrictions {
+    #geo_restriction {
+      #restriction_type = "none"
     #}
   #}
-   
+
+  #viewer_certificate {
+    #acm_certificate_arn = data.aws_acm_certificate.wildcard_website.arn
+    #ssl_support_method  = "sni-only"
+  #}
+
+  ##optional 
+  ##custom_error_response {
+    ##error_caching_min_ttl = 300
+    ##error_code            = 404
+    ##response_page_path    = "/404.html"
+    ##response_code         = 404
+  ##}
+
+  #tags = merge(var.tags, {
+    #ManagedBy = "terraform"
+    #Changed   = formatdate("YYYY-MM-DD hh:mm ZZZ", timestamp())
+  #})
+
+  #lifecycle {
+    #ignore_changes = [
+      #tags["Changed"],
+      #viewer_certificate,
+    #]
+  #}
+#}
+
+
+resource "random_string" "origin_token" {
+  length = 30
+  special = false
+}
+
+resource "aws_cloudfront_distribution" "website_cdn_root" {
   origin {
-    domain_name = aws_s3_bucket.apex_domain_redirect_bucket.website_endpoint
-    origin_id   = "apex-domain-cloudfront-origin"
- 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.1"]
+    domain_name   = aws_alb.load_balancer.arn
+    origin_id            = "alb"
+    custom_header {
+      name = "X-Origin-Token"
+      value = random_string.origin_token.results
     }
-  } 
-   
-
-  #optional 
-  #default_root_object = "index.html"
-
-  logging_config {
-    bucket = aws_s3_bucket.website_logs.bucket_domain_name
-    prefix = "${var.www-website-domain}/"
   }
 
-  default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "DELETE"]
-    cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    # This needs to match the `origin_id` above 
-    target_origin_id = "apex-domain-cloudfront-origin"  #aws_alb.load_balancer.id 
-    min_ttl          = "0"
-    default_ttl      = "300"
-    max_ttl          = "1200"
+  enabled = true
+  aliases   = [var.www-website-domain]
 
-    # Redirects any HTTP request to HTTPS 
-    #viewer_protocol_policy = "redirect-to-https" 
-    viewer_protocol_policy = "allow-all" 
-    compress               = true
+  default_cache_behavior {
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id     = "alb"
 
     forwarded_values {
-      query_string = false
+      query_string = true
+      headers        = ["X-Origin-Token"]
+
       cookies {
-        forward = "none"
+        forward = "all"
       }
     }
 
-  }
-
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
-
-  viewer_certificate {
-    acm_certificate_arn = data.aws_acm_certificate.wildcard_website.arn
-    ssl_support_method  = "sni-only"
-  }
-
-  #optional 
-  #custom_error_response {
-    #error_caching_min_ttl = 300
-    #error_code            = 404
-    #response_page_path    = "/404.html"
-    #response_code         = 404
-  #}
-
-  tags = merge(var.tags, {
-    ManagedBy = "terraform"
-    Changed   = formatdate("YYYY-MM-DD hh:mm ZZZ", timestamp())
-  })
-
-  lifecycle {
-    ignore_changes = [
-      tags["Changed"],
-      viewer_certificate,
-    ]
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
   }
 }
+
+
 
 
 # Creates the DNS record to point on the main CloudFront distribution ID
@@ -226,20 +268,20 @@ resource "aws_route53_record" "website_cdn_root_record" {
 
 
 ## Creates the DNS record to point on the main CloudFront distribution ID
-resource "aws_route53_record" "website_cdn_www_record" {
-  #zone_id = data.aws_route53_zone.wildcard_website.zone_id
-  zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = "www"
-  type    = "CNAME"
-  records        = [var.www-website-domain]
+#resource "aws_route53_record" "website_cdn_www_record" {
+  ##zone_id = data.aws_route53_zone.wildcard_website.zone_id
+  #zone_id = "${aws_route53_zone.main.zone_id}"
+  #name    = "www"
+  #type    = "CNAME"
+  #records        = [var.www-website-domain]
   #ttl = 1800
  
-  alias {
-    name = aws_alb.load_balancer.dns_name #aws_cloudfront_distribution.website_cdn_root.domain_name
-    zone_id = aws_alb.load_balancer.zone_id #aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
-    evaluate_target_health = false
-  }
-}
+  #alias {
+    #name = aws_alb.load_balancer.dns_name #aws_cloudfront_distribution.website_cdn_root.domain_name
+    #zone_id = aws_alb.load_balancer.zone_id #aws_cloudfront_distribution.website_cdn_root.hosted_zone_id
+    #evaluate_target_health = false
+  #}
+#}
 
 
 # Creates the DNS record to point on the main CloudFront distribution ID
@@ -261,13 +303,13 @@ resource "aws_route53_record" "website_cdn_www_record" {
 
 ##https://engineering.resolvergroup.com/2020/06/how-to-redirect-an-apex-domain-to-www-using-cloudfront-and-s3/
 # bucket to redirect apex record to cname
-resource "aws_s3_bucket" "apex_domain_redirect_bucket" {
-  bucket = var.website-domain
-  acl    = "public-read"
-  website {
-    redirect_all_requests_to = "https://${var.www-website-domain}"
-  }
-}
+#resource "aws_s3_bucket" "apex_domain_redirect_bucket" {
+  #bucket = var.website-domain
+  #acl    = "public-read"
+  #website {
+    #redirect_all_requests_to = "https://${var.www-website-domain}"
+  #}
+#}
 
 
 # Creates bucket to store logs
