@@ -149,8 +149,8 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
     max_ttl          = "1200"
 
     # Redirects any HTTP request to HTTPS 
-    viewer_protocol_policy = "redirect-to-https" 
-    #viewer_protocol_policy = "allow-all" 
+    #viewer_protocol_policy = "redirect-to-https" 
+    viewer_protocol_policy = "allow-all" 
     compress               = true
 
     forwarded_values {
