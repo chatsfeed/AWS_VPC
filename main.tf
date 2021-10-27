@@ -241,7 +241,18 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
         forward = "all"
       }
     }
-
+     
+    restrictions {
+     geo_restriction {
+       restriction_type = "none"
+     }
+   }
+     
+    viewer_certificate {
+      acm_certificate_arn = data.aws_acm_certificate.wildcard_website.arn
+      ssl_support_method  = "sni-only"
+    }
+     
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = 3600
