@@ -782,7 +782,7 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
 resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
   depends_on   = [aws_alb_target_group.tg_load_balancer_http]  
   listener_arn = aws_alb_listener.listener_load_balancer_http.arn
-  priority     = 100   
+  #priority     = 100   
   action {    
     type             = "forward"    
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_http.id}"  
@@ -800,7 +800,7 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
 resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_http" {
   depends_on   = [aws_alb_target_group.tg_load_balancer_http]  
   listener_arn = aws_alb_listener.listener_load_balancer_http.arn
-  priority     = 100   
+  #priority     = 100   
   action {    
     type             = "forward"    
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_http.id}"  
@@ -818,7 +818,7 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_http" {
 resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_http" {
   depends_on   = [aws_alb_target_group.tg_load_balancer_http]  
   listener_arn = aws_alb_listener.listener_load_balancer_http.arn
-  priority     = 100   
+  #priority     = 100   
   action {    
     type             = "forward"    
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_http.id}"  
@@ -899,7 +899,7 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
 resource "aws_alb_listener_rule" "listener_load_balancer_rule_https" {
   depends_on   = [aws_alb_target_group.tg_load_balancer_https]  
   listener_arn = aws_alb_listener.listener_load_balancer_https.arn
-  priority     = 100   
+  #priority     = 100   
   action {    
     type             = "forward"    
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_https.id}"  
@@ -917,7 +917,7 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_https" {
 resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_https" {
   depends_on   = [aws_alb_target_group.tg_load_balancer_https]  
   listener_arn = aws_alb_listener.listener_load_balancer_https.arn
-  priority     = 100   
+  #priority     = 100   
   action {    
     type             = "forward"    
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_https.id}"  
@@ -936,7 +936,7 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_https" {
 resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_https" {
   depends_on   = [aws_alb_target_group.tg_load_balancer_https]  
   listener_arn = aws_alb_listener.listener_load_balancer_https.arn
-  priority     = 100   
+  #priority     = 100   
   action {    
     type             = "forward"    
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_https.id}"  
