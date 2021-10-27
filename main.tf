@@ -203,6 +203,24 @@ resource "aws_route53_record" "website_cdn_root_record" {
   }
 }
 
+resource "aws_route53_record" "www_cname_route53_record" {
+  zone_id = aws_route53_zone.main.zone_id # Replace with your zone ID
+  name    = "www.chatsfeed.com" # Replace with your subdomain, Note: not valid with "apex" domains, e.g. example.com
+  type    = "CNAME"
+  ttl     = "60"
+  records = [aws_alb.load_balancer.dns_name]
+}
+
+
+resource "aws_route53_record" "app_cname_route53_record" {
+  zone_id = aws_route53_zone.main.zone_id # Replace with your zone ID
+  name    = "app.chatsfeed.com" # Replace with your subdomain, Note: not valid with "apex" domains, e.g. example.com
+  type    = "CNAME"
+  ttl     = "60"
+  records = [aws_alb.load_balancer.dns_name]
+}
+
+
 
 ##https://engineering.resolvergroup.com/2020/06/how-to-redirect-an-apex-domain-to-www-using-cloudfront-and-s3/
 # bucket to redirect apex record to cname
