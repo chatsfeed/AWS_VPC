@@ -133,7 +133,7 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
   #}
    
   origin {
-    domain_name = aws_alb.load_balancer.arn #aws_s3_bucket.apex_domain_redirect_bucket.website_endpoint
+    domain_name = aws_alb.load_balancer.dns_name #aws_s3_bucket.apex_domain_redirect_bucket.website_endpoint
     origin_id   = "apex-domain-cloudfront-origin"
  
     custom_origin_config {
@@ -186,14 +186,6 @@ resource "aws_cloudfront_distribution" "website_cdn_root" {
     acm_certificate_arn = data.aws_acm_certificate.wildcard_website.arn
     ssl_support_method  = "sni-only"
   }
-
-  #optional 
-  #custom_error_response {
-    #error_caching_min_ttl = 300
-    #error_code            = 404
-    #response_page_path    = "/404.html"
-    #response_code         = 404
-  #}
 
   tags = merge(var.tags, {
     ManagedBy = "terraform"
