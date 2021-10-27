@@ -214,13 +214,14 @@ resource "random_string" "origin_token" {
   special = false
 }
 
+#https://coresolutions.ltd/blog/protecting-your-alb-with-waf-cloudfront/
 resource "aws_cloudfront_distribution" "website_cdn_root" {
   origin {
     domain_name   = aws_alb.load_balancer.arn
     origin_id            = "alb"
     custom_header {
       name = "X-Origin-Token"
-      value = random_string.origin_token.results
+      value = random_string.origin_token.result
     }
   }
 
