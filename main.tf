@@ -224,7 +224,7 @@ resource "aws_route53_record" "website_cdn_root_record" {
 }
 
 
-#https://engineering.resolvergroup.com/2020/06/how-to-redirect-an-apex-domain-to-www-using-cloudfront-and-s3/
+
 ## Creates the DNS record to point on the main CloudFront distribution ID
 #resource "aws_route53_record" "website_cdn_www_record" {
   ##zone_id = data.aws_route53_zone.wildcard_website.zone_id
@@ -258,14 +258,16 @@ resource "aws_route53_record" "website_cdn_root_record" {
   #}
 #}
 
+
+##https://engineering.resolvergroup.com/2020/06/how-to-redirect-an-apex-domain-to-www-using-cloudfront-and-s3/
 # bucket to redirect apex record to cname
-resource "aws_s3_bucket" "apex_domain_redirect_bucket" {
-  bucket = var.website-domain
-  acl    = "public-read"
-  website {
-    redirect_all_requests_to = "https://${var.www-website-domain}"
-  }
-}
+#resource "aws_s3_bucket" "apex_domain_redirect_bucket" {
+  #bucket = var.website-domain
+  #acl    = "public-read"
+  #website {
+    #redirect_all_requests_to = "https://${var.www-website-domain}"
+  #}
+#}
 
 
 # Creates bucket to store logs
