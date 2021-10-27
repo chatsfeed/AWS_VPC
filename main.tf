@@ -109,154 +109,102 @@ data "aws_acm_certificate" "wildcard_website" {
 
 ## CloudFront
 # Creates the CloudFront distribution to serve the static website
-#resource "aws_cloudfront_distribution" "website_cdn_root" {
-  #enabled     = true
-  ## (Optional) - The price class for this distribution. One of PriceClass_All, PriceClass_200, PriceClass_100 
-  #price_class = "PriceClass_All"
-  ## (Optional) - Extra CNAMEs (alternate domain names), if any, for this distribution 
-  #aliases = [var.website-domain, var.www-website-domain, var.app-website-domain]
-
-  ## Origin is where CloudFront gets its content from 
-  ##origin {
-    ##origin_id   = aws_alb.load_balancer.id 
-    ##domain_name = var.website-domain
-
-    ##custom_origin_config {
-      ### The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
-      ### HTTP Only is the default setting when the origin is an Amazon S3 static website hosting endpoint
-      ### This is because Amazon S3 doesn’t support HTTPS connections for static website hosting endpoints. 
-      ##origin_protocol_policy = "match-viewer"
-      ##http_port            = 80
-      ##https_port           = 443
-      ##origin_ssl_protocols = ["SSLv3", "TLSv1.2", "TLSv1.1", "TLSv1"]
-    ##}
-  ##}
-   
-  #origin {
-    #domain_name = aws_s3_bucket.apex_domain_redirect_bucket.website_endpoint
-    #origin_id   = "apex-domain-cloudfront-origin"
- 
-    #custom_origin_config {
-      #http_port              = 80
-      #https_port             = 443
-      #origin_protocol_policy = "http-only"
-      #origin_ssl_protocols   = ["TLSv1.1"]
-    #}
-  #} 
-   
-
-  ##optional 
-  ##default_root_object = "index.html"
-
-  #logging_config {
-    #bucket = aws_s3_bucket.website_logs.bucket_domain_name
-    #prefix = "${var.www-website-domain}/"
-  #}
-
-  #default_cache_behavior {
-    #allowed_methods  = ["GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "DELETE"]
-    #cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    ## This needs to match the `origin_id` above 
-    #target_origin_id = "apex-domain-cloudfront-origin"  #aws_alb.load_balancer.id 
-    #min_ttl          = "0"
-    #default_ttl      = "300"
-    #max_ttl          = "1200"
-
-    ## Redirects any HTTP request to HTTPS 
-    ##viewer_protocol_policy = "redirect-to-https" 
-    #viewer_protocol_policy = "allow-all" 
-    #compress               = true
-
-    #forwarded_values {
-      #query_string = false
-      #cookies {
-        #forward = "none"
-      #}
-    #}
-
-  #}
-
-  #restrictions {
-    #geo_restriction {
-      #restriction_type = "none"
-    #}
-  #}
-
-  #viewer_certificate {
-    #acm_certificate_arn = data.aws_acm_certificate.wildcard_website.arn
-    #ssl_support_method  = "sni-only"
-  #}
-
-  ##optional 
-  ##custom_error_response {
-    ##error_caching_min_ttl = 300
-    ##error_code            = 404
-    ##response_page_path    = "/404.html"
-    ##response_code         = 404
-  ##}
-
-  #tags = merge(var.tags, {
-    #ManagedBy = "terraform"
-    #Changed   = formatdate("YYYY-MM-DD hh:mm ZZZ", timestamp())
-  #})
-
-  #lifecycle {
-    #ignore_changes = [
-      #tags["Changed"],
-      #viewer_certificate,
-    #]
-  #}
-#}
-
-
-resource "random_string" "origin_token" {
-  length = 30
-  special = false
-}
-
-#https://coresolutions.ltd/blog/protecting-your-alb-with-waf-cloudfront/
 resource "aws_cloudfront_distribution" "website_cdn_root" {
+  enabled     = true
+  # (Optional) - The price class for this distribution. One of PriceClass_All, PriceClass_200, PriceClass_100 
+  price_class = "PriceClass_All"
+  # (Optional) - Extra CNAMEs (alternate domain names), if any, for this distribution 
+  aliases = [var.www-website-domain]
+
+  # Origin is where CloudFront gets its content from 
+  #origin {
+    #origin_id   = aws_alb.load_balancer.id 
+    #domain_name = var.website-domain
+
+    #custom_origin_config {
+      ## The protocol policy that you want CloudFront to use when fetching objects from the origin server (a.k.a S3 in our situation). 
+      ## HTTP Only is the default setting when the origin is an Amazon S3 static website hosting endpoint
+      ## This is because Amazon S3 doesn’t support HTTPS connections for static website hosting endpoints. 
+      #origin_protocol_policy = "match-viewer"
+      #http_port            = 80
+      #https_port           = 443
+      #origin_ssl_protocols = ["SSLv3", "TLSv1.2", "TLSv1.1", "TLSv1"]
+    #}
+  #}
+   
   origin {
-    domain_name   = aws_alb.load_balancer.arn
-    origin_id            = "alb"
-    custom_header {
-      name = "X-Origin-Token"
-      value = random_string.origin_token.result
+    domain_name = aws_alb.load_balancer.arn #aws_s3_bucket.apex_domain_redirect_bucket.website_endpoint
+    origin_id   = "apex-domain-cloudfront-origin"
+ 
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.1"]
+    }
+  } 
+   
+
+  #optional 
+  #default_root_object = "index.html"
+
+  logging_config {
+    bucket = aws_s3_bucket.website_logs.bucket_domain_name
+    prefix = "${var.www-website-domain}/"
+  }
+
+  default_cache_behavior {
+    allowed_methods  = ["GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "DELETE"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    # This needs to match the `origin_id` above 
+    target_origin_id = "apex-domain-cloudfront-origin"  #aws_alb.load_balancer.id 
+    min_ttl          = "0"
+    default_ttl      = "300"
+    max_ttl          = "1200"
+
+    # Redirects any HTTP request to HTTPS 
+    #viewer_protocol_policy = "redirect-to-https" 
+    viewer_protocol_policy = "allow-all" 
+    compress               = true
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
     }
   }
 
-  enabled = true
-  aliases   = [var.www-website-domain]
+  viewer_certificate {
+    acm_certificate_arn = data.aws_acm_certificate.wildcard_website.arn
+    ssl_support_method  = "sni-only"
+  }
 
-  default_cache_behavior {
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id     = "alb"
+  #optional 
+  #custom_error_response {
+    #error_caching_min_ttl = 300
+    #error_code            = 404
+    #response_page_path    = "/404.html"
+    #response_code         = 404
+  #}
 
-    forwarded_values {
-      query_string = true
-      headers        = ["X-Origin-Token"]
+  tags = merge(var.tags, {
+    ManagedBy = "terraform"
+    Changed   = formatdate("YYYY-MM-DD hh:mm ZZZ", timestamp())
+  })
 
-      cookies {
-        forward = "all"
-      }
-    }
-     
-    restrictions {
-     geo_restriction {
-       restriction_type = "none"
-     }
-   }
-     
-    viewer_certificate {
-      acm_certificate_arn = data.aws_acm_certificate.wildcard_website.arn
-      ssl_support_method  = "sni-only"
-    }
-     
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+  lifecycle {
+    ignore_changes = [
+      tags["Changed"],
+      viewer_certificate,
+    ]
   }
 }
 
