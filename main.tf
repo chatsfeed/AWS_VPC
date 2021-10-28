@@ -1100,8 +1100,8 @@ resource "aws_launch_configuration" "app_instance" {
             yum install docker -y
             systemctl restart docker
             systemctl enable docker
-            docker pull nginx
-            docker run --name mynginx1 -p 80:80 -p 443:443 -d nginx
+            docker pull apache
+            docker run --name apache1 -p 80:80 -p 443:443 -d apache
    
   EOF
 
