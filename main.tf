@@ -672,7 +672,7 @@ resource "aws_security_group" "sg_load_balancer" {
 
 
 # We create a target group for our application load balancer
-resource "aws_alb_target_group" "tg_load_balancer_http" {
+resource "aws_alb_target_group" "tg_load_balancer_http_app" {
   name     = "target-group-load-balancer-http"
   port     = 80
   protocol = "HTTP"
@@ -683,11 +683,22 @@ resource "aws_alb_target_group" "tg_load_balancer_http" {
   ]
 }
 
-resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http" {
-  target_group_arn = aws_alb_target_group.tg_load_balancer_http.arn
-  target_id        = aws_instance.wordpress0.id
-  port             = 80
+resource "aws_alb_target_group" "tg_load_balancer_http_www" {
+  name     = "target-group-load-balancer-http"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.vpc.id
+
+  depends_on = [
+    aws_vpc.vpc
+  ]
 }
+
+#resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http" {
+  #target_group_arn = aws_alb_target_group.tg_load_balancer_http.arn
+  #target_id        = aws_instance.wordpress0.id
+  #port             = 80
+#}
 
 # Create a new ALB Target Group attachment
 #resource "aws_autoscaling_attachment" "asg_alb_attachment_http" {
@@ -696,7 +707,7 @@ resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http" {
 #}
 
 
-resource "aws_alb_target_group" "tg_load_balancer_https" {
+resource "aws_alb_target_group" "tg_load_balancer_https_app" {
   name     = "target-group-load-balancer-https"
   port     = 443
   protocol = "HTTPS"
@@ -707,11 +718,22 @@ resource "aws_alb_target_group" "tg_load_balancer_https" {
   ]
 }
 
-resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https" {
-  target_group_arn = aws_alb_target_group.tg_load_balancer_https.arn
-  target_id        = aws_instance.wordpress0.id
-  port             = 443
+resource "aws_alb_target_group" "tg_load_balancer_https_www" {
+  name     = "target-group-load-balancer-https"
+  port     = 443
+  protocol = "HTTPS"
+  vpc_id   = aws_vpc.vpc.id
+
+  depends_on = [
+    aws_vpc.vpc
+  ]
 }
+
+#resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https" {
+  #target_group_arn = aws_alb_target_group.tg_load_balancer_https.arn
+  #target_id        = aws_instance.wordpress0.id
+  #port             = 443
+#}
 
 
 # Create a new ALB Target Group attachment
@@ -1056,12 +1078,12 @@ resource "aws_security_group" "security_group_wordpress" {
 }
 
 
-resource "aws_launch_configuration" "wordpress_instance" {
-  name_prefix   = "wordpress-instance-"
+resource "aws_launch_configuration" "app_instance" {
+  name_prefix   = "app-instance-"
   image_id      = "ami-077e31c4939f6a2f3" #var.ec2_ami
   instance_type = var.ec2_type
   key_name      = aws_key_pair.public_ssh_key.key_name
-  security_groups = [aws_security_group.security_group_wordpress.id]
+  security_groups = [aws_security_group.sg_app.id]
 
    user_data = <<EOF
             # #! /bin/bash
@@ -1089,66 +1111,105 @@ resource "aws_launch_configuration" "wordpress_instance" {
   }
 
   depends_on = [
-    aws_security_group.security_group_wordpress
+    aws_security_group.sg_app
   ]
 }
 
-resource "aws_autoscaling_group" "auto_scaling_wordpress_az_1" {
-  name                 = "auto-scaling-wordpress-az-1"
-  launch_configuration = aws_launch_configuration.wordpress_instance.id
+resource "aws_autoscaling_group" "auto_scaling_app" {
+  name                 = "auto-scaling-app"
+  availability_zones = [var.AZ_1, var.AZ_2] 
+  launch_configuration = aws_launch_configuration.app_instance.id
   min_size             = 1
   max_size             = 3
-  vpc_zone_identifier       = [aws_subnet.private_subnet_1.id]
-  #target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https.arn]
+  vpc_zone_identifier       = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
+  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http_app.arn, aws_alb_target_group.tg_load_balancer_https_app.arn]
 
   lifecycle {
     create_before_destroy = true
   }
 
   depends_on = [
-    aws_launch_configuration.wordpress_instance,
-    aws_subnet.private_subnet_1,
-    #aws_alb_target_group.tg_load_balancer_http,
-    #aws_alb_target_group.tg_load_balancer_https 
+    aws_launch_configuration.app_instance,
+    aws_subnet.public_subnet_1,
+    aws_subnet.public_subnet_2.id,
+    aws_alb_target_group.tg_load_balancer_http_app,
+    aws_alb_target_group.tg_load_balancer_https_app 
   ]
 }
 
-#resource "aws_autoscaling_group" "auto_scaling_wordpress_az_2" {
-  #name                 = "auto-scaling-wordpress-az-2"
-  #launch_configuration = aws_launch_configuration.wordpress_instance.name
-  #min_size             = 1
-  #max_size             = 3
-  #vpc_zone_identifier       = [aws_subnet.private_subnet_2.id]
-  #target_group_arns         = [aws_alb_target_group.tg_load_balancer_http.arn, aws_alb_target_group.tg_load_balancer_https.arn]
 
-  #lifecycle {
-    #create_before_destroy = true
-  #}
+resource "aws_launch_configuration" "www_instance" {
+  name_prefix   = "www-instance-"
+  image_id      = "ami-077e31c4939f6a2f3" #var.ec2_ami
+  instance_type = var.ec2_type
+  key_name      = aws_key_pair.public_ssh_key.key_name
+  security_groups = [aws_security_group.sg_www.id]
 
-  #depends_on = [
-    #aws_launch_configuration.wordpress_instance,
-    #aws_subnet.private_subnet_2,
-    #aws_alb_target_group.tg_load_balancer_http,
-    #aws_alb_target_group.tg_load_balancer_https
-  #]
-#}
+   user_data = <<EOF
+            # #! /bin/bash
+            #yum update
+            #yum install docker -y
+            #systemctl restart docker
+            #systemctl enable docker
+            #docker pull wordpress
+            #docker run --name wordpress -p 443:443 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
+            #-e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=root -e WORDPRESS_DB_NAME=wordpressdb -d wordpress
+   
+            #! /bin/bash
+            yum update
+            yum install docker -y
+            systemctl restart docker
+            systemctl enable docker
+            docker pull nginx
+            docker run --name mynginx1 -p 80:80 -p 443:443 -d nginx
+   
+  EOF
+
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [
+    aws_security_group.sg_www
+  ]
+}
+
+
+resource "aws_autoscaling_group" "auto_scaling_www" {
+  name                 = "auto-scaling-www"
+  availability_zones = [var.AZ_1, var.AZ_2] 
+  launch_configuration = aws_launch_configuration.www_instance.id
+  min_size             = 1
+  max_size             = 3
+  vpc_zone_identifier       = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
+  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http_www.arn, aws_alb_target_group.tg_load_balancer_https_www.arn]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [
+    aws_launch_configuration.www_instance,
+    aws_subnet.public_subnet_1,
+    aws_subnet.public_subnet_2.id,
+    aws_alb_target_group.tg_load_balancer_http_www,
+    aws_alb_target_group.tg_load_balancer_https_www 
+  ]
+}
 
 
 
 
 
 
-
-
-
-
-# We create a security group for our wordpress instance
-resource "aws_security_group" "sg_wordpress0" {
+# We create a security group for our app instance
+resource "aws_security_group" "sg_app" {
   depends_on = [
     aws_vpc.vpc,
   ]
 
-  name        = "sg wordpress 0"
+  name        = "sg app"
   description = "Allow http inbound traffic"
   vpc_id      = aws_vpc.vpc.id
 
@@ -1158,7 +1219,14 @@ resource "aws_security_group" "sg_wordpress0" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-  }
+  } 
+  ingress {
+    description = "allow TCP"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  } 
   ingress {
     description = "allow SSH"
     from_port   = 22
@@ -1176,14 +1244,14 @@ resource "aws_security_group" "sg_wordpress0" {
 }
 
 # We create our wordpress instance in public subnet
-resource "aws_instance" "wordpress0" {
+resource "aws_instance" "app" {
   depends_on = [
-    aws_security_group.sg_wordpress0
+    aws_security_group.sg_app
   ]
   ami = "ami-077e31c4939f6a2f3"
   instance_type = "t2.micro"
   key_name = aws_key_pair.public_ssh_key.key_name
-  vpc_security_group_ids = [aws_security_group.sg_wordpress0.id]
+  vpc_security_group_ids = [aws_security_group.sg_app.id]
   subnet_id = aws_subnet.public_subnet_1.id
   user_data = <<EOF
             #! /bin/bash
@@ -1196,21 +1264,106 @@ resource "aws_instance" "wordpress0" {
   EOF
 
   tags = {
-      Name = "nginx"
+      Name = "app"
   }
 }
 
-# We create an elastic IP for our wordpress server
+# We create an elastic IP for our app server
 # A static public IP address that we can assign to our bastion host
-resource "aws_eip" "wordpress_elastic_ip0" {
-   vpc = true
+#resource "aws_eip" "app_elastic_ip_1" {
+   #vpc = true
+#}
+
+# We associate the elastic ip to our app server
+#resource "aws_eip_association" "app_eip_1_association" {
+  #instance_id   = aws_instance.app.id
+  #allocation_id = aws_eip.app_elastic_ip_1.id
+#}
+
+
+
+
+
+# We create a security group for our www instance
+resource "aws_security_group" "sg_www" {
+  depends_on = [
+    aws_vpc.vpc,
+  ]
+
+  name        = "sg www"
+  description = "Allow http inbound traffic"
+  vpc_id      = aws_vpc.vpc.id
+
+  ingress {
+    description = "allow TCP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "allow TCP"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }   
+  ingress {
+    description = "allow SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] 
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
-# We associate the elastic ip to our wordpress server
-resource "aws_eip_association" "wordpress_eip_association" {
-  instance_id   = aws_instance.wordpress0.id
-  allocation_id = aws_eip.wordpress_elastic_ip0.id
+# We create our www instance in public subnet
+resource "aws_instance" "www" {
+  depends_on = [
+    aws_security_group.sg_www
+  ]
+  ami = "ami-077e31c4939f6a2f3"
+  instance_type = "t2.micro"
+  key_name = aws_key_pair.public_ssh_key.key_name
+  vpc_security_group_ids = [aws_security_group.sg_www.id]
+  subnet_id = aws_subnet.public_subnet_1.id
+  user_data = <<EOF
+            #! /bin/bash
+            yum update
+            yum install docker -y
+            systemctl restart docker
+            systemctl enable docker
+            docker pull nginx
+            docker run --name mynginx1 -p 80:80 -p 443:443 -d nginx
+  EOF
+
+  tags = {
+      Name = "www"
+  }
 }
+
+# We create an elastic IP for our app server
+# A static public IP address that we can assign to our bastion host
+#resource "aws_eip" "www_elastic_ip_1" {
+   #vpc = true
+#}
+
+# We associate the elastic ip to our www server
+#resource "aws_eip_association" "www_eip_1_association" {
+  #instance_id   = aws_instance.www.id
+  #allocation_id = aws_eip.www_elastic_ip_1.id
+#}
+
+
+
+
 
 
 
