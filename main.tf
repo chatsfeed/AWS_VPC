@@ -673,7 +673,7 @@ resource "aws_security_group" "sg_load_balancer" {
 
 # We create a target group for our application load balancer
 resource "aws_alb_target_group" "tg_load_balancer_http_app" {
-  name     = "target-group-load-balancer-http-app"
+  name     = "tg-load-balancer-http-app"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.vpc.id
@@ -684,7 +684,7 @@ resource "aws_alb_target_group" "tg_load_balancer_http_app" {
 }
 
 resource "aws_alb_target_group" "tg_load_balancer_http_www" {
-  name     = "target-group-load-balancer-http-www"
+  name     = "tg-load-balancer-http-www"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.vpc.id
@@ -708,7 +708,7 @@ resource "aws_alb_target_group" "tg_load_balancer_http_www" {
 
 
 resource "aws_alb_target_group" "tg_load_balancer_https_app" {
-  name     = "target-group-load-balancer-https-app"
+  name     = "tg-load-balancer-https-app"
   port     = 443
   protocol = "HTTPS"
   vpc_id   = aws_vpc.vpc.id
@@ -719,7 +719,7 @@ resource "aws_alb_target_group" "tg_load_balancer_https_app" {
 }
 
 resource "aws_alb_target_group" "tg_load_balancer_https_www" {
-  name     = "target-group-load-balancer-https-www"
+  name     = "tg-load-balancer-https-www"
   port     = 443
   protocol = "HTTPS"
   vpc_id   = aws_vpc.vpc.id
