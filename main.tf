@@ -1086,15 +1086,6 @@ resource "aws_launch_configuration" "app_instance" {
   security_groups = [aws_security_group.sg_app.id]
 
    user_data = <<EOF
-            # #! /bin/bash
-            #yum update
-            #yum install docker -y
-            #systemctl restart docker
-            #systemctl enable docker
-            #docker pull wordpress
-            #docker run --name wordpress -p 443:443 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
-            #-e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=root -e WORDPRESS_DB_NAME=wordpressdb -d wordpress
-   
             #! /bin/bash
             yum update
             yum install docker -y
@@ -1146,15 +1137,6 @@ resource "aws_launch_configuration" "www_instance" {
   security_groups = [aws_security_group.sg_www.id]
 
    user_data = <<EOF
-            # #! /bin/bash
-            #yum update
-            #yum install docker -y
-            #systemctl restart docker
-            #systemctl enable docker
-            #docker pull wordpress
-            #docker run --name wordpress -p 443:443 -e WORDPRESS_DB_HOST=${aws_instance.mysql.private_ip} \
-            #-e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=root -e WORDPRESS_DB_NAME=wordpressdb -d wordpress
-   
             #! /bin/bash
             yum update
             yum install docker -y
