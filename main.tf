@@ -1131,7 +1131,7 @@ resource "aws_autoscaling_group" "auto_scaling_app" {
   depends_on = [
     aws_launch_configuration.app_instance,
     aws_subnet.public_subnet_1,
-    aws_subnet.public_subnet_2.id,
+    aws_subnet.public_subnet_2,
     aws_alb_target_group.tg_load_balancer_http_app,
     aws_alb_target_group.tg_load_balancer_https_app 
   ]
@@ -1192,7 +1192,7 @@ resource "aws_autoscaling_group" "auto_scaling_www" {
   depends_on = [
     aws_launch_configuration.www_instance,
     aws_subnet.public_subnet_1,
-    aws_subnet.public_subnet_2.id,
+    aws_subnet.public_subnet_2,
     aws_alb_target_group.tg_load_balancer_http_www,
     aws_alb_target_group.tg_load_balancer_https_www 
   ]
