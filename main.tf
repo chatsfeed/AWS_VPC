@@ -791,12 +791,12 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
    
   default_action {
     type             = "forward"
-    target_group_arn =   aws_alb_target_group.tg_load_balancer_http_www.arn
+    target_group_arn =   aws_alb_target_group.tg_load_balancer_http_app.arn
   }
  
   depends_on = [
     aws_alb.load_balancer,
-    aws_alb_target_group.tg_load_balancer_http_www
+    aws_alb_target_group.tg_load_balancer_http_app
   ]
 }
 
