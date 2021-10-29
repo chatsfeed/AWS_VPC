@@ -1117,7 +1117,7 @@ resource "aws_launch_configuration" "app_instance" {
 
 resource "aws_autoscaling_group" "auto_scaling_app" {
   name                 = "auto-scaling-app"
-  availability_zones = [var.AZ_1, var.AZ_2] 
+  #availability_zones = [var.AZ_1, var.AZ_2] 
   launch_configuration = aws_launch_configuration.app_instance.id
   min_size             = 1
   max_size             = 3
@@ -1178,7 +1178,7 @@ resource "aws_launch_configuration" "www_instance" {
 
 resource "aws_autoscaling_group" "auto_scaling_www" {
   name                 = "auto-scaling-www"
-  availability_zones = [var.AZ_1, var.AZ_2] 
+  #availability_zones = [var.AZ_1, var.AZ_2] 
   launch_configuration = aws_launch_configuration.www_instance.id
   min_size             = 1
   max_size             = 3
