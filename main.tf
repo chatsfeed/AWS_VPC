@@ -779,15 +779,15 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
   port              = "80"
   protocol          = "HTTP"
   
-  #default_action {
-    #type = "redirect"
+  default_action {
+    type = "redirect"
 
-    #redirect {
-      #port        = "443"
-      #protocol    = "HTTPS"
-      #status_code = "HTTP_301"
-    #}
-  #}
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
    
   #default_action {
     #type             = "forward"
@@ -906,10 +906,10 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
   # Default certificate
   certificate_arn   = data.aws_acm_certificate.wildcard_website_alb.arn
    
-  #default_action {
-    #target_group_arn = aws_alb_target_group.tg_load_balancer_https_www.arn
-    #type = "forward"
-  #}
+  default_action {
+    target_group_arn = aws_alb_target_group.tg_load_balancer_https_app.arn
+    type = "forward"
+  }
 
   depends_on = [
     aws_alb.load_balancer
