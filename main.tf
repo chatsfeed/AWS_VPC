@@ -791,12 +791,12 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
    
   default_action {
     type             = "forward"
-    target_group_arn =   aws_alb_target_group.tg_load_balancer_http.arn
+    target_group_arn =   aws_alb_target_group.tg_load_balancer_http_www.arn
   }
  
   depends_on = [
     aws_alb.load_balancer,
-    aws_alb_target_group.tg_load_balancer_http
+    aws_alb_target_group.tg_load_balancer_http_www
   ]
 }
 
@@ -907,13 +907,13 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
   certificate_arn   = data.aws_acm_certificate.wildcard_website_alb.arn
    
   default_action {
-    target_group_arn = aws_alb_target_group.tg_load_balancer_https.arn
+    target_group_arn = aws_alb_target_group.tg_load_balancer_https_www.arn
     type = "forward"
   }
 
   depends_on = [
     aws_alb.load_balancer,
-    aws_alb_target_group.tg_load_balancer_https
+    aws_alb_target_group.tg_load_balancer_https_www
   ]
 }
 
