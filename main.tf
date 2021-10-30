@@ -802,7 +802,7 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
         content {
           #arn = aws_alb_target_group.cd[target_group.key].arn
           #arn = [target_group.value].arn 
-          arn = each.key.arn  
+          arn = each.value
         }
       }
     }
@@ -912,10 +912,10 @@ data "aws_acm_certificate" "wildcard_website_alb" {
 
 locals {
   target_groups = [
-     aws_alb_target_group.tg_load_balancer_http_app, 
-     aws_alb_target_group.tg_load_balancer_https_app, 
-     aws_alb_target_group.tg_load_balancer_http_www,
-     aws_alb_target_group.tg_load_balancer_https_www
+     aws_alb_target_group.tg_load_balancer_http_app.arn, 
+     aws_alb_target_group.tg_load_balancer_https_app.arn, 
+     aws_alb_target_group.tg_load_balancer_http_www.arn,
+     aws_alb_target_group.tg_load_balancer_https_www.arn
   ]
 }
 
@@ -943,7 +943,7 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
         content {
           #arn = aws_alb_target_group.cd[target_group.key].arn
           #arn = [target_group.value].arn 
-          arn = each.key.arn  
+          arn = each.value
         }
       }
     }
