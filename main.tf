@@ -698,7 +698,7 @@ resource "aws_security_group" "sg_load_balancer" {
 
 resource "aws_alb_target_group" "tg_load_balancer_https_app" {
   name     = "tg-load-balancer-https-app"
-  port     = 443
+  port     = 80
   protocol = "HTTPS"
   vpc_id   = aws_vpc.vpc.id
 
@@ -709,7 +709,7 @@ resource "aws_alb_target_group" "tg_load_balancer_https_app" {
 
 resource "aws_alb_target_group" "tg_load_balancer_https_www" {
   name     = "tg-load-balancer-https-www"
-  port     = 443
+  port     = 80
   protocol = "HTTPS"
   vpc_id   = aws_vpc.vpc.id
 
