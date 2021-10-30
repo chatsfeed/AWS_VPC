@@ -802,7 +802,7 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
         content {
           #arn = aws_alb_target_group.cd[target_group.key].arn
           #arn = [target_group.value].arn 
-          arn = each.value
+          arn = each.key
         }
       }
     }
@@ -943,7 +943,7 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
         content {
           #arn = aws_alb_target_group.cd[target_group.key].arn
           #arn = [target_group.value].arn 
-          arn = each.value
+          arn = each.key
         }
       }
     }
