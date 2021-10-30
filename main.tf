@@ -794,10 +794,10 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
     forward {
     #1 to 5 target_group 
     target_group {
-        target_group_arn = aws_alb_target_group.tg_load_balancer_http_app.arn
+        arn = aws_alb_target_group.tg_load_balancer_http_app.arn
     }
     target_group {
-        target_group_arn = aws_alb_target_group.tg_load_balancer_http_www.arn
+        arn = aws_alb_target_group.tg_load_balancer_http_www.arn
     }
    }
   }
@@ -921,10 +921,10 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
     forward {
     # 1 to 5 target_group 
     target_group {
-        target_group_arn = aws_alb_target_group.tg_load_balancer_https_app.arn
+        arn = aws_alb_target_group.tg_load_balancer_https_app.arn
     }
     target_group {
-        target_group_arn = aws_alb_target_group.tg_load_balancer_https_www.arn
+        arn = aws_alb_target_group.tg_load_balancer_https_www.arn
     }
    }
   }
