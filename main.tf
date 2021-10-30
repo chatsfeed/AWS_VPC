@@ -798,58 +798,58 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
 }
 
 
-resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
-  depends_on   = [aws_alb_target_group.tg_load_balancer_http_www]  
-  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
-  #priority     = 100   
-  action {    
-    type             = "forward"    
-    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_www.id}"  
-  }  
+#resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
+#  depends_on   = [aws_alb_target_group.tg_load_balancer_http_www]  
+#  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
+#  #priority     = 100   
+#  action {    
+#    type             = "forward"    
+#    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_www.id}"  
+#  }  
    
-  condition {
-    host_header {
-      values = [var.www-website-domain] 
-    }
- }
+#  condition {
+#    host_header {
+#      values = [var.www-website-domain] 
+#    }
+# }
    
-}
+#}
 
 
-resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_http" {
-  depends_on   = [aws_alb_target_group.tg_load_balancer_http_www]  
-  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
-  #priority     = 100   
-  action {    
-    type             = "forward"    
-    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_www.id}"  
-  }  
+#resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_http" {
+#  depends_on   = [aws_alb_target_group.tg_load_balancer_http_www]  
+#  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
+#  #priority     = 100   
+#  action {    
+#    type             = "forward"    
+#    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_www.id}"  
+#  }  
    
-  condition {
-    host_header {
-      values = [var.website-domain] 
-    }
- }
+#  condition {
+#    host_header {
+#      values = [var.website-domain] 
+#    }
+# }
    
-}
+#}
 
 
-resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_http" {
-  depends_on   = [aws_alb_target_group.tg_load_balancer_http_app]  
-  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
-  #priority     = 100   
-  action {    
-    type             = "forward"    
-    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_app.id}"  
-  }  
+#resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_http" {
+#  depends_on   = [aws_alb_target_group.tg_load_balancer_http_app]  
+#  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
+#  #priority     = 100   
+#  action {    
+#    type             = "forward"    
+#    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_app.id}"  
+#  }  
    
-  condition {
-    host_header {
-      values = [var.app-website-domain] 
-    }
- }
+#  condition {
+#    host_header {
+#      values = [var.app-website-domain] 
+#    }
+# }
    
-}
+#}
 
 
 
