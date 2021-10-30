@@ -997,7 +997,7 @@ resource "aws_launch_configuration" "app_instance" {
             systemctl restart docker
             systemctl enable docker
             docker pull httpd
-            docker run --name httpd1 -p 443:443 -d httpd
+            docker run --name httpd1 -p 80:80 -d httpd
   EOF
 
 
@@ -1047,7 +1047,7 @@ resource "aws_launch_configuration" "www_instance" {
             systemctl restart docker
             systemctl enable docker
             docker pull nginx
-            docker run --name mynginx1 -p 443:443 -d nginx
+            docker run --name mynginx1 -p 80:80 -d nginx
    
   EOF
 
