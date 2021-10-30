@@ -672,39 +672,28 @@ resource "aws_security_group" "sg_load_balancer" {
 
 
 # We create a target group for our application load balancer
-resource "aws_alb_target_group" "tg_load_balancer_http_app" {
-  name     = "tg-load-balancer-http-app"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.vpc.id
+#resource "aws_alb_target_group" "tg_load_balancer_http_app" {
+#  name     = "tg-load-balancer-http-app"
+#  port     = 80
+#  protocol = "HTTP"
+#  vpc_id   = aws_vpc.vpc.id
 
-  depends_on = [
-    aws_vpc.vpc
-  ]
-}
-
-resource "aws_alb_target_group" "tg_load_balancer_http_www" {
-  name     = "tg-load-balancer-http-www"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.vpc.id
-
-  depends_on = [
-    aws_vpc.vpc
-  ]
-}
-
-#resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http" {
-  #target_group_arn = aws_alb_target_group.tg_load_balancer_http.arn
-  #target_id        = aws_instance.wordpress0.id
-  #port             = 80
+#  depends_on = [
+#    aws_vpc.vpc
+#  ]
 #}
 
-# Create a new ALB Target Group attachment
-#resource "aws_autoscaling_attachment" "asg_alb_attachment_http" {
-  #autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
-  #alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_http.arn
+#resource "aws_alb_target_group" "tg_load_balancer_http_www" {
+#  name     = "tg-load-balancer-http-www"
+#  port     = 80
+#  protocol = "HTTP"
+#  vpc_id   = aws_vpc.vpc.id
+
+#  depends_on = [
+#    aws_vpc.vpc
+#  ]
 #}
+
 
 
 resource "aws_alb_target_group" "tg_load_balancer_https_app" {
@@ -728,12 +717,6 @@ resource "aws_alb_target_group" "tg_load_balancer_https_www" {
     aws_vpc.vpc
   ]
 }
-
-#resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http" {
-  #target_group_arn = aws_alb_target_group.tg_load_balancer_http_www.arn
-  #target_id        = aws_instance.app.id
-  #port             = 443
-#}
 
 
 # Create a new ALB Target Group attachment
@@ -785,28 +768,28 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
   port              = "80"
   protocol          = "HTTP"
   
-  #default_action {
-    #type = "redirect"
-
-    #redirect {
-      #port        = "443"
-      #protocol    = "HTTPS"
-      #status_code = "HTTP_301"
-    #}
-  #}
-   
   default_action {
-    type             = "forward"
-    forward {
-    #1 to 5 target_group 
-    target_group {
-        arn = aws_alb_target_group.tg_load_balancer_http_app.arn
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
     }
-    target_group {
-        arn = aws_alb_target_group.tg_load_balancer_http_www.arn
-    }
-   }
   }
+   
+  #default_action {
+    #type             = "forward"
+    #forward {
+    #1 to 5 target_group 
+    #target_group {
+    #    arn = aws_alb_target_group.tg_load_balancer_http_app.arn
+    #}
+    #target_group {
+    #    arn = aws_alb_target_group.tg_load_balancer_http_www.arn
+    #}
+   #}
+  #}
    
   depends_on = [
     aws_alb.load_balancer
@@ -953,7 +936,7 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_https" {
    
   condition {
     host_header {
-      values = ["${var.www-website-domain}"]
+      values = [var.www-website-domain]
     }
  }
    
@@ -971,7 +954,7 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_https" {
    
   condition {
     host_header {
-      values = ["${var.website-domain}"]
+      values = [var.website-domain]
     }
  }
    
@@ -990,116 +973,14 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_https" {
    
   condition {
     host_header {
-      values = ["${var.app-website-domain}"]
+      values = [var.app-website-domain]
     }
  }
    
 }
 
 
-# We create a security group for our mysql instance
-#resource "aws_security_group" "sg_mysql" {
-  #depends_on = [
-    #aws_vpc.vpc,
-  #]
-  #name        = "sg mysql"
-  #description = "Allow mysql inbound traffic"
-  #vpc_id      = aws_vpc.vpc.id
 
-  #ingress {
-    #description = "allow TCP"
-    #from_port   = 3306
-    #to_port     = 3306
-    #protocol    = "tcp"
-    #security_groups = [aws_security_group.security_group_wordpress.id]
-  #}
-
-  #ingress {
-    #description = "allow SSH"
-    #from_port   = 22
-    #to_port     = 22
-    #protocol    = "tcp"
-    #cidr_blocks = ["${aws_eip.bastion_elastic_ip_1.public_ip}/32", "${aws_eip.bastion_elastic_ip_2.public_ip}/32"]
-  #}
-
-  #egress {
-    #from_port   = 0
-    #to_port     = 0
-    #protocol    = "-1"
-    #cidr_blocks = ["0.0.0.0/0"]
-  #}
-#}
-
-# We create our mysql instance in the private subnet
-#resource "aws_instance" "mysql" {
-  #depends_on = [
-    #aws_security_group.sg_mysql,
-    #aws_nat_gateway.nat_gateway_1,
-    #aws_route_table_association.associate_routetable_to_private_subnet_1,
-  #]
-  #ami = "ami-077e31c4939f6a2f3"
-  #instance_type = "t2.micro"
-  #key_name = aws_key_pair.public_ssh_key.key_name
-  #vpc_security_group_ids = [aws_security_group.sg_mysql.id]
-  #subnet_id = aws_subnet.private_subnet_1.id
-  #user_data = file("configure_mysql.sh")
-  #tags = {
-      #Name = "mysql-instance"
-  #}
-#}
-
-
-# We create a security group for our wordpress instance
-#resource "aws_security_group" "security_group_wordpress" {
-  #depends_on = [
-    #aws_vpc.vpc,
-  #]
-
-  #name        = "security-group-wordpress"
-  #description = "Allow http inbound traffic"
-  #vpc_id      = aws_vpc.vpc.id
-
-  #ingress {
-    #description = "allow TCP"
-    #from_port   = 80
-    #to_port     = 80
-    #protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"] 
-    ##cidr_blocks = [var.public_subnet_1_CIDR, var.public_subnet_2_CIDR]   
-  #}
-   
-  #ingress {
-    #description = "allow TCP"
-    #from_port   = 443
-    #to_port     = 443
-    #protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"] 
-    ##cidr_blocks = [var.public_subnet_1_CIDR, var.public_subnet_2_CIDR]   
-  #} 
-   
-  #ingress {
-    #description = "allow TCP"
-    #from_port   = 8080
-    #to_port     = 8080
-    #protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-  #}
-   
-  #ingress {
-    #description = "allow SSH"
-    #from_port   = 22
-    #to_port     = 22
-    #protocol    = "tcp"
-    #cidr_blocks = ["${aws_eip.bastion_elastic_ip_1.public_ip}/32", "${aws_eip.bastion_elastic_ip_2.public_ip}/32"] 
-  #}
-
-  #egress {
-    #from_port   = 0
-    #to_port     = 0
-    #protocol    = "-1"
-    #cidr_blocks = ["0.0.0.0/0"]
-  #}
-#}
 
 
 resource "aws_launch_configuration" "app_instance" {
@@ -1116,7 +997,7 @@ resource "aws_launch_configuration" "app_instance" {
             systemctl restart docker
             systemctl enable docker
             docker pull httpd
-            docker run --name httpd1 -p 80:80 -p 443:443 -d httpd
+            docker run --name httpd1 -p 443:443 -d httpd
   EOF
 
 
@@ -1166,7 +1047,7 @@ resource "aws_launch_configuration" "www_instance" {
             systemctl restart docker
             systemctl enable docker
             docker pull nginx
-            docker run --name mynginx1 -p 80:80 -p 443:443 -d nginx
+            docker run --name mynginx1 -p 443:443 -d nginx
    
   EOF
 
@@ -1248,43 +1129,6 @@ resource "aws_security_group" "sg_app" {
   }
 }
 
-# We create our wordpress instance in public subnet
-#resource "aws_instance" "app" {
-#  depends_on = [
-#    aws_security_group.sg_app
-#  ]
-#  ami = "ami-077e31c4939f6a2f3"
-#  instance_type = "t2.micro"
-#  key_name = aws_key_pair.public_ssh_key.key_name
-#  vpc_security_group_ids = [aws_security_group.sg_app.id]
-#  subnet_id = aws_subnet.public_subnet_1.id
-#  user_data = <<EOF
-#            #! /bin/bash
-#            yum update
-#            yum install docker -y
-#            systemctl restart docker
-#            systemctl enable docker
-#            docker pull httpd
-#            docker run --name httpd1 -p 80:80 -p 443:443 -d httpd
-#  EOF
-
-#  tags = {
-#      Name = "app"
-#  }
-#}
-
-# We create an elastic IP for our app server
-# A static public IP address that we can assign to our bastion host
-#resource "aws_eip" "app_elastic_ip_1" {
-   #vpc = true
-#}
-
-# We associate the elastic ip to our app server
-#resource "aws_eip_association" "app_eip_1_association" {
-  #instance_id   = aws_instance.app.id
-  #allocation_id = aws_eip.app_elastic_ip_1.id
-#}
-
 
 
 
@@ -1329,42 +1173,6 @@ resource "aws_security_group" "sg_www" {
   }
 }
 
-# We create our www instance in public subnet
-#resource "aws_instance" "www" {
-#  depends_on = [
-#    aws_security_group.sg_www
-#  ]
-#  ami = "ami-077e31c4939f6a2f3"
-#  instance_type = "t2.micro"
-#  key_name = aws_key_pair.public_ssh_key.key_name
-#  vpc_security_group_ids = [aws_security_group.sg_www.id]
-#  subnet_id = aws_subnet.public_subnet_1.id
-#  user_data = <<EOF
-#            #! /bin/bash
-#            yum update
-#            yum install docker -y
-#            systemctl restart docker
-#            systemctl enable docker
-#            docker pull nginx
-#            docker run --name mynginx1 -p 80:80 -p 443:443 -d nginx
-#  EOF
-
-#  tags = {
-#      Name = "www"
-#  }
-#}
-
-# We create an elastic IP for our app server
-# A static public IP address that we can assign to our bastion host
-#resource "aws_eip" "www_elastic_ip_1" {
-   #vpc = true
-#}
-
-# We associate the elastic ip to our www server
-#resource "aws_eip_association" "www_eip_1_association" {
-  #instance_id   = aws_instance.www.id
-  #allocation_id = aws_eip.www_elastic_ip_1.id
-#}
 
 
 
