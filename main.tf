@@ -740,11 +740,13 @@ resource "aws_alb_target_group" "tg_load_balancer_https_www" {
 resource "aws_autoscaling_attachment" "asg_alb_attachment_https_www" {
   autoscaling_group_name = aws_autoscaling_group.auto_scaling_www.id
   alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_www.arn
+  port             = 443 
 }
 
 resource "aws_autoscaling_attachment" "asg_alb_attachment_https_app" {
   autoscaling_group_name = aws_autoscaling_group.auto_scaling_app.id
   alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_app.arn
+  port             = 443 
 }
 
 
@@ -1115,8 +1117,8 @@ resource "aws_launch_configuration" "app_instance" {
             yum install docker -y
             systemctl restart docker
             systemctl enable docker
-            docker pull httpd
-            docker run --name httpd1 -p 80:80 -p 443:443 -d httpd
+            docker pull nginx
+            docker run --name mynginx -p 80:80 -p 443:443 -d nginx
    
   EOF
 
