@@ -737,10 +737,16 @@ resource "aws_alb_target_group" "tg_load_balancer_https_www" {
 
 
 # Create a new ALB Target Group attachment
-#resource "aws_autoscaling_attachment" "asg_alb_attachment_https" {
-  #autoscaling_group_name = aws_autoscaling_group.auto_scaling_wordpress_az_1.id
-  #alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https.arn
-#}
+resource "aws_autoscaling_attachment" "asg_alb_attachment_https_www" {
+  autoscaling_group_name = aws_autoscaling_group.auto_scaling_www.id
+  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_www.arn
+}
+
+resource "aws_autoscaling_attachment" "asg_alb_attachment_https_app" {
+  autoscaling_group_name = aws_autoscaling_group.auto_scaling_app.id
+  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_app.arn
+}
+
 
 
 # We create our application load balancer
@@ -1131,7 +1137,7 @@ resource "aws_autoscaling_group" "auto_scaling_app" {
   min_size             = 1
   max_size             = 3
   vpc_zone_identifier       = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
-  target_group_arns         = [aws_alb_target_group.tg_load_balancer_https_app.arn]
+  #target_group_arns         = [aws_alb_target_group.tg_load_balancer_https_app.arn]
 
   lifecycle {
     create_before_destroy = true
@@ -1140,9 +1146,9 @@ resource "aws_autoscaling_group" "auto_scaling_app" {
   depends_on = [
     aws_launch_configuration.app_instance,
     aws_subnet.public_subnet_1,
-    aws_subnet.public_subnet_2,
+    aws_subnet.public_subnet_2
     #aws_alb_target_group.tg_load_balancer_http_app,
-    aws_alb_target_group.tg_load_balancer_https_app 
+    #aws_alb_target_group.tg_load_balancer_https_app 
   ]
 }
 
@@ -1183,7 +1189,7 @@ resource "aws_autoscaling_group" "auto_scaling_www" {
   min_size             = 1
   max_size             = 3
   vpc_zone_identifier       = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
-  target_group_arns         = [aws_alb_target_group.tg_load_balancer_https_www.arn]
+  #target_group_arns         = [aws_alb_target_group.tg_load_balancer_https_www.arn]
 
   lifecycle {
     create_before_destroy = true
@@ -1192,9 +1198,9 @@ resource "aws_autoscaling_group" "auto_scaling_www" {
   depends_on = [
     aws_launch_configuration.www_instance,
     aws_subnet.public_subnet_1,
-    aws_subnet.public_subnet_2,
+    aws_subnet.public_subnet_2
     #aws_alb_target_group.tg_load_balancer_http_www,
-    aws_alb_target_group.tg_load_balancer_https_www 
+    #aws_alb_target_group.tg_load_balancer_https_www 
   ]
 }
 
