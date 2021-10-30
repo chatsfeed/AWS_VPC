@@ -791,14 +791,15 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
    
   default_action {
     type             = "forward"
-    #target_group_arn =   aws_alb_target_group.tg_load_balancer_http_app.arn
+    forward {
     #1 to 5 target_group 
     target_group {
         target_group_arn = aws_alb_target_group.tg_load_balancer_http_app.arn
     }
     target_group {
         target_group_arn = aws_alb_target_group.tg_load_balancer_http_www.arn
-    }     
+    }
+   }
   }
    
   depends_on = [
@@ -917,14 +918,15 @@ resource "aws_alb_listener" "listener_load_balancer_https" {
    
   default_action {
     type             = "forward"
-    #target_group_arn =   aws_alb_target_group.tg_load_balancer_http_app.arn
+    forward {
     # 1 to 5 target_group 
     target_group {
         target_group_arn = aws_alb_target_group.tg_load_balancer_https_app.arn
     }
     target_group {
         target_group_arn = aws_alb_target_group.tg_load_balancer_https_www.arn
-    }       
+    }
+   }
   }
 
   depends_on = [
