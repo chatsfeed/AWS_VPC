@@ -815,7 +815,7 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
   #priority     = 100   
   action {    
     type             = "forward"    
-    target_group_arn = "${aws_alb_target_group.tg_load_balancer_http_www.id}"  
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_www.id}"  
   }  
    
   condition {
@@ -833,7 +833,7 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_http" {
   #priority     = 100   
   action {    
     type             = "forward"    
-    target_group_arn = "${aws_alb_target_group.tg_load_balancer_http_www.id}"  
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_www.id}"  
   }  
    
   condition {
@@ -851,7 +851,7 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_http" {
   #priority     = 100   
   action {    
     type             = "forward"    
-    target_group_arn = "${aws_alb_target_group.tg_load_balancer_http_app.id}"  
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_app.id}"  
   }  
    
   condition {
@@ -1131,7 +1131,7 @@ resource "aws_autoscaling_group" "auto_scaling_app" {
   min_size             = 1
   max_size             = 3
   vpc_zone_identifier       = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
-  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http_app.arn, aws_alb_target_group.tg_load_balancer_https_app.arn]
+  target_group_arns         = [aws_alb_target_group.tg_load_balancer_https_app.arn]
 
   lifecycle {
     create_before_destroy = true
@@ -1141,7 +1141,7 @@ resource "aws_autoscaling_group" "auto_scaling_app" {
     aws_launch_configuration.app_instance,
     aws_subnet.public_subnet_1,
     aws_subnet.public_subnet_2,
-    aws_alb_target_group.tg_load_balancer_http_app,
+    #aws_alb_target_group.tg_load_balancer_http_app,
     aws_alb_target_group.tg_load_balancer_https_app 
   ]
 }
@@ -1183,7 +1183,7 @@ resource "aws_autoscaling_group" "auto_scaling_www" {
   min_size             = 1
   max_size             = 3
   vpc_zone_identifier       = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
-  target_group_arns         = [aws_alb_target_group.tg_load_balancer_http_www.arn, aws_alb_target_group.tg_load_balancer_https_www.arn]
+  target_group_arns         = [aws_alb_target_group.tg_load_balancer_https_www.arn]
 
   lifecycle {
     create_before_destroy = true
@@ -1193,7 +1193,7 @@ resource "aws_autoscaling_group" "auto_scaling_www" {
     aws_launch_configuration.www_instance,
     aws_subnet.public_subnet_1,
     aws_subnet.public_subnet_2,
-    aws_alb_target_group.tg_load_balancer_http_www,
+    #aws_alb_target_group.tg_load_balancer_http_www,
     aws_alb_target_group.tg_load_balancer_https_www 
   ]
 }
@@ -1244,29 +1244,29 @@ resource "aws_security_group" "sg_app" {
 }
 
 # We create our wordpress instance in public subnet
-resource "aws_instance" "app" {
-  depends_on = [
-    aws_security_group.sg_app
-  ]
-  ami = "ami-077e31c4939f6a2f3"
-  instance_type = "t2.micro"
-  key_name = aws_key_pair.public_ssh_key.key_name
-  vpc_security_group_ids = [aws_security_group.sg_app.id]
-  subnet_id = aws_subnet.public_subnet_1.id
-  user_data = <<EOF
-            #! /bin/bash
-            yum update
-            yum install docker -y
-            systemctl restart docker
-            systemctl enable docker
-            docker pull apache
-            docker run --name apache1 -p 80:80 -p 443:443 -d apache
-  EOF
+#resource "aws_instance" "app" {
+  #depends_on = [
+    #aws_security_group.sg_app
+  #]
+  #ami = "ami-077e31c4939f6a2f3"
+  #instance_type = "t2.micro"
+  #key_name = aws_key_pair.public_ssh_key.key_name
+  #vpc_security_group_ids = [aws_security_group.sg_app.id]
+  #subnet_id = aws_subnet.public_subnet_1.id
+  #user_data = <<EOF
+  #          #! /bin/bash
+  #          yum update
+  #          yum install docker -y
+  #          systemctl restart docker
+  #          systemctl enable docker
+  #          docker pull apache
+  #          docker run --name apache1 -p 80:80 -p 443:443 -d apache
+  #EOF
 
-  tags = {
-      Name = "app"
-  }
-}
+  #tags = {
+  #    Name = "app"
+  #}
+#}
 
 # We create an elastic IP for our app server
 # A static public IP address that we can assign to our bastion host
@@ -1325,29 +1325,29 @@ resource "aws_security_group" "sg_www" {
 }
 
 # We create our www instance in public subnet
-resource "aws_instance" "www" {
-  depends_on = [
-    aws_security_group.sg_www
-  ]
-  ami = "ami-077e31c4939f6a2f3"
-  instance_type = "t2.micro"
-  key_name = aws_key_pair.public_ssh_key.key_name
-  vpc_security_group_ids = [aws_security_group.sg_www.id]
-  subnet_id = aws_subnet.public_subnet_1.id
-  user_data = <<EOF
-            #! /bin/bash
-            yum update
-            yum install docker -y
-            systemctl restart docker
-            systemctl enable docker
-            docker pull nginx
-            docker run --name mynginx1 -p 80:80 -p 443:443 -d nginx
-  EOF
+#resource "aws_instance" "www" {
+#  depends_on = [
+#    aws_security_group.sg_www
+#  ]
+#  ami = "ami-077e31c4939f6a2f3"
+#  instance_type = "t2.micro"
+#  key_name = aws_key_pair.public_ssh_key.key_name
+#  vpc_security_group_ids = [aws_security_group.sg_www.id]
+#  subnet_id = aws_subnet.public_subnet_1.id
+#  user_data = <<EOF
+#            #! /bin/bash
+#            yum update
+#            yum install docker -y
+#            systemctl restart docker
+#            systemctl enable docker
+#            docker pull nginx
+#            docker run --name mynginx1 -p 80:80 -p 443:443 -d nginx
+#  EOF
 
-  tags = {
-      Name = "www"
-  }
-}
+#  tags = {
+#      Name = "www"
+#  }
+#}
 
 # We create an elastic IP for our app server
 # A static public IP address that we can assign to our bastion host
