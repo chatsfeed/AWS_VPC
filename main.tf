@@ -729,23 +729,23 @@ resource "aws_alb_target_group" "tg_load_balancer_https_www" {
   ]
 }
 
-#resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https" {
-  #target_group_arn = aws_alb_target_group.tg_load_balancer_https.arn
-  #target_id        = aws_instance.wordpress0.id
-  #port             = 443
-#}
+resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https" {
+  target_group_arn = aws_alb_target_group.tg_load_balancer_https_www.arn
+  target_id        = aws_instance.app.id
+  port             = 443
+}
 
 
 # Create a new ALB Target Group attachment
-resource "aws_autoscaling_attachment" "asg_alb_attachment_https_www" {
-  autoscaling_group_name = aws_autoscaling_group.auto_scaling_www.id
-  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_www.arn
-}
+#resource "aws_autoscaling_attachment" "asg_alb_attachment_https_www" {
+#  autoscaling_group_name = aws_autoscaling_group.auto_scaling_www.id
+#  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_www.arn
+#}
 
-resource "aws_autoscaling_attachment" "asg_alb_attachment_https_app" {
-  autoscaling_group_name = aws_autoscaling_group.auto_scaling_app.id
-  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_app.arn
-}
+#resource "aws_autoscaling_attachment" "asg_alb_attachment_https_app" {
+#  autoscaling_group_name = aws_autoscaling_group.auto_scaling_app.id
+#  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_app.arn
+#}
 
 
 
@@ -1250,29 +1250,29 @@ resource "aws_security_group" "sg_app" {
 }
 
 # We create our wordpress instance in public subnet
-#resource "aws_instance" "app" {
-  #depends_on = [
-    #aws_security_group.sg_app
-  #]
-  #ami = "ami-077e31c4939f6a2f3"
-  #instance_type = "t2.micro"
-  #key_name = aws_key_pair.public_ssh_key.key_name
-  #vpc_security_group_ids = [aws_security_group.sg_app.id]
-  #subnet_id = aws_subnet.public_subnet_1.id
-  #user_data = <<EOF
-  #          #! /bin/bash
-  #          yum update
-  #          yum install docker -y
-  #          systemctl restart docker
-  #          systemctl enable docker
-  #          docker pull apache
-  #          docker run --name apache1 -p 80:80 -p 443:443 -d apache
-  #EOF
+resource "aws_instance" "app" {
+  depends_on = [
+    aws_security_group.sg_app
+  ]
+  ami = "ami-077e31c4939f6a2f3"
+  instance_type = "t2.micro"
+  key_name = aws_key_pair.public_ssh_key.key_name
+  vpc_security_group_ids = [aws_security_group.sg_app.id]
+  subnet_id = aws_subnet.public_subnet_1.id
+  user_data = <<EOF
+            #! /bin/bash
+            yum update
+            yum install docker -y
+            systemctl restart docker
+            systemctl enable docker
+            docker pull httpd
+            docker run --name httpd1 -p 80:80 -p 443:443 -d httpd
+  EOF
 
-  #tags = {
-  #    Name = "app"
-  #}
-#}
+  tags = {
+      Name = "app"
+  }
+}
 
 # We create an elastic IP for our app server
 # A static public IP address that we can assign to our bastion host
