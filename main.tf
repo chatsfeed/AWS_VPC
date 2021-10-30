@@ -740,13 +740,11 @@ resource "aws_alb_target_group" "tg_load_balancer_https_www" {
 resource "aws_autoscaling_attachment" "asg_alb_attachment_https_www" {
   autoscaling_group_name = aws_autoscaling_group.auto_scaling_www.id
   alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_www.arn
-  port             = 443 
 }
 
 resource "aws_autoscaling_attachment" "asg_alb_attachment_https_app" {
   autoscaling_group_name = aws_autoscaling_group.auto_scaling_app.id
   alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_app.arn
-  port             = 443 
 }
 
 
