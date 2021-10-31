@@ -25,17 +25,8 @@ output "bastion_host_2_private_ip" {
   value = "${aws_instance.bastion_host_2.private_ip}"
 }
 
-
-output "app_1_public_ip" {  
-  value = "${aws_eip.app_elastic_ip_1.public_ip}"
-}
-
 output "app_1_private_ip" {  
   value = "${aws_instance.app.private_ip}"
-}
-
-output "www_1_public_ip" {  
-  value = "${aws_eip.www_elastic_ip_1.public_ip}"
 }
 
 output "www_1_private_ip" {  
