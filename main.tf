@@ -868,20 +868,11 @@ resource "aws_instance" "app" {
   depends_on = [
     aws_security_group.sg_app
   ]
-  ami = "ami-077e31c4939f6a2f3" #var.ec2_ami
+  ami = var.ec2_ami  #"ami-077e31c4939f6a2f3"
   instance_type = "t2.micro"
   key_name = aws_key_pair.public_ssh_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_app.id]
   subnet_id = aws_subnet.public_subnet_1.id
-  user_data = <<EOF
-            #! /bin/bash
-            yum update
-            yum install docker -y
-            systemctl restart docker
-            systemctl enable docker
-            docker pull nginx
-            docker run --name mynginx1 -p 80:80 -d nginx
-  EOF
 
   tags = {
       Name = "app"
@@ -894,20 +885,11 @@ resource "aws_instance" "www" {
   depends_on = [
     aws_security_group.sg_www
   ]
-  ami = "ami-077e31c4939f6a2f3" #var.ec2_ami
+  ami = var.ec2_ami  #"ami-077e31c4939f6a2f3"
   instance_type = "t2.micro"
   key_name = aws_key_pair.public_ssh_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_www.id]
   subnet_id = aws_subnet.public_subnet_1.id
-  user_data = <<EOF
-            #! /bin/bash
-            yum update
-            yum install docker -y
-            systemctl restart docker
-            systemctl enable docker
-            docker pull httpd
-            docker run --name myhttpd1 -p 80:80 -d httpd
-  EOF
 
   tags = {
       Name = "www"
