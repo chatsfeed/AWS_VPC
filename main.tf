@@ -1072,8 +1072,7 @@ resource "aws_launch_configuration" "app_instance" {
             yum install docker -y
             systemctl restart docker
             systemctl enable docker
-            docker pull httpd
-            docker run --name httpd1 -p 80:80 -d httpd
+            docker run -P -d nginxdemos/hello
   EOF
 
 
@@ -1122,8 +1121,7 @@ resource "aws_launch_configuration" "www_instance" {
             yum install docker -y
             systemctl restart docker
             systemctl enable docker
-            docker pull httpd
-            docker run --name myhttpd1 -p 80:80 -d httpd
+            docker run --rm -it -p 80:80 yeasy/simple-web:latest
    
   EOF
 
@@ -1189,6 +1187,13 @@ resource "aws_security_group" "sg_app" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   } 
+  ingress {
+    description = "allow TCP"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }   
   ingress {
     description = "allow SSH"
     from_port   = 22
