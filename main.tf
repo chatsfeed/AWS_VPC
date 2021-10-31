@@ -934,11 +934,16 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_https" {
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_www.id}"  
   }  
    
+  #condition {
+  #  host_header {
+  #    values = [var.www-website-domain]
+  #  }
+ #}
+   
   condition {
-    host_header {
-      values = [var.www-website-domain]
-    }
- }
+    field = "host-header"
+    values = [var.www-website-domain]
+  } 
    
 }
 
@@ -952,11 +957,16 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_https" {
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_www.id}"  
   }  
    
+  #condition {
+  #  host_header {
+  #    values = [var.website-domain]
+  #  }
+  #}
+   
   condition {
-    host_header {
-      values = [var.website-domain]
-    }
- }
+    field = "host-header"
+    values = [var.website-domain]
+  }  
    
 }
 
@@ -971,11 +981,16 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_https" {
     target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_app.id}"  
   }  
    
+  #condition {
+  #  host_header {
+  #    values = [var.app-website-domain]
+  #  }
+  #}
+   
   condition {
-    host_header {
-      values = [var.app-website-domain]
-    }
- }
+    field = "host-header"
+    values = [var.app-website-domain]
+  }  
    
 }
 
