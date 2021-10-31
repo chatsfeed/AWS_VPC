@@ -672,34 +672,34 @@ resource "aws_security_group" "sg_load_balancer" {
 
 
 # We create a target group for our application load balancer
-#resource "aws_alb_target_group" "tg_load_balancer_http_app" {
-#  name     = "tg-load-balancer-http-app"
-#  port     = 80
-#  protocol = "HTTP"
-#  vpc_id   = aws_vpc.vpc.id
+resource "aws_alb_target_group" "tg_load_balancer_http_app" {
+  name     = "tg-load-balancer-http-app"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.vpc.id
 
-#  depends_on = [
-#    aws_vpc.vpc
-#  ]
-#}
+  depends_on = [
+    aws_vpc.vpc
+  ]
+}
 
-#resource "aws_alb_target_group" "tg_load_balancer_http_www" {
-#  name     = "tg-load-balancer-http-www"
-#  port     = 80
-#  protocol = "HTTP"
-#  vpc_id   = aws_vpc.vpc.id
+resource "aws_alb_target_group" "tg_load_balancer_http_www" {
+  name     = "tg-load-balancer-http-www"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.vpc.id
 
-#  depends_on = [
-#    aws_vpc.vpc
-#  ]
-#}
+  depends_on = [
+    aws_vpc.vpc
+  ]
+}
 
 
 
 resource "aws_alb_target_group" "tg_load_balancer_https_app" {
   name     = "tg-load-balancer-https-app"
-  port     = 80
-  protocol = "HTTP"
+  port     = 443
+  protocol = "HTTPS"
   vpc_id   = aws_vpc.vpc.id
 
   depends_on = [
@@ -709,8 +709,8 @@ resource "aws_alb_target_group" "tg_load_balancer_https_app" {
 
 resource "aws_alb_target_group" "tg_load_balancer_https_www" {
   name     = "tg-load-balancer-https-www"
-  port     = 80
-  protocol = "HTTP"
+  port     = 443
+  protocol = "HTTPS"
   vpc_id   = aws_vpc.vpc.id
 
   depends_on = [
@@ -720,6 +720,16 @@ resource "aws_alb_target_group" "tg_load_balancer_https_www" {
 
 
 # Create a new ALB Target Group attachment
+resource "aws_autoscaling_attachment" "asg_alb_attachment_http_www" {
+  autoscaling_group_name = aws_autoscaling_group.auto_scaling_www.id
+  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_http_www.arn
+}
+
+resource "aws_autoscaling_attachment" "asg_alb_attachment_http_app" {
+  autoscaling_group_name = aws_autoscaling_group.auto_scaling_app.id
+  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_http_app.arn
+}
+
 resource "aws_autoscaling_attachment" "asg_alb_attachment_https_www" {
   autoscaling_group_name = aws_autoscaling_group.auto_scaling_www.id
   alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_www.arn
@@ -783,10 +793,10 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
     forward {
     #1 to 5 target_group 
     target_group {
-        arn = aws_alb_target_group.tg_load_balancer_https_app.arn
+        arn = aws_alb_target_group.tg_load_balancer_http_app.arn
     }
     target_group {
-        arn = aws_alb_target_group.tg_load_balancer_https_www.arn
+        arn = aws_alb_target_group.tg_load_balancer_http_www.arn
     }
    }
   }
@@ -796,6 +806,66 @@ resource "aws_alb_listener" "listener_load_balancer_http" {
     #aws_alb_target_group.tg_load_balancer_http_app
   ]
 }
+
+
+
+resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
+  depends_on   = [aws_alb_target_group.tg_load_balancer_http_www]  
+  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
+  #priority     = 100   
+  action {    
+    type             = "forward"    
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_http_www.id}"  
+  }  
+   
+  condition {
+    host_header {
+      values = ["${var.www-website-domain}"]
+    }
+  } 
+   
+
+}
+
+
+resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_http" {
+  depends_on   = [aws_alb_target_group.tg_load_balancer_http_www]  
+  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
+  #priority     = 100   
+  action {    
+    type             = "forward"    
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_http_www.id}"  
+  }  
+   
+  condition {
+    host_header {
+      values = ["${var.website-domain}"]
+    }
+  } 
+   
+}
+
+
+
+resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_http" {
+  depends_on   = [aws_alb_target_group.tg_load_balancer_http_app]  
+  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
+  #priority     = 100   
+  action {    
+    type             = "forward"    
+    target_group_arn = "${aws_alb_target_group.tg_load_balancer_http_app.id}"  
+  }  
+   
+  condition {
+    host_header {
+      values = ["${var.app-website-domain}"]
+    }
+  } 
+   
+   
+}
+
+
 
 
 #resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
