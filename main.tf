@@ -1011,7 +1011,7 @@ resource "aws_instance" "app" {
   depends_on = [
     aws_security_group.sg_app
   ]
-  ami = "ami-077e31c4939f6a2f3"
+  ami = var.ec2_ami
   instance_type = "t2.micro"
   key_name = aws_key_pair.public_ssh_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_app.id]
@@ -1048,7 +1048,7 @@ resource "aws_instance" "www" {
   depends_on = [
     aws_security_group.sg_www
   ]
-  ami = "ami-077e31c4939f6a2f3"
+  ami = var.ec2_ami
   instance_type = "t2.micro"
   key_name = aws_key_pair.public_ssh_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_www.id]
