@@ -24,3 +24,20 @@ output "bastion_host_2_public_ip" {
 output "bastion_host_2_private_ip" {  
   value = "${aws_instance.bastion_host_2.private_ip}"
 }
+
+
+output "app_1_public_ip" {  
+  value = "${aws_eip.app.public_ip}"
+}
+
+output "app_1_private_ip" {  
+  value = "${aws_instance.app.private_ip}"
+}
+
+output "www_1_public_ip" {  
+  value = "${aws_eip.www.public_ip}"
+}
+
+output "www_1_private_ip" {  
+  value = "${aws_instance.www.private_ip}"
+}
