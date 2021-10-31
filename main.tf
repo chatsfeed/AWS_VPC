@@ -879,7 +879,8 @@ resource "aws_instance" "app" {
             yum install docker -y
             systemctl restart docker
             systemctl enable docker
-            docker run --rm -it -p 80:80 yeasy/simple-web:latest
+            docker pull nginx
+            docker run --name mynginx1 -p 80:80 -d nginx
   EOF
 
   tags = {
