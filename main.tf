@@ -1122,8 +1122,8 @@ resource "aws_launch_configuration" "www_instance" {
             yum install docker -y
             systemctl restart docker
             systemctl enable docker
-            docker pull nginx
-            docker run --name mynginx1 -p 80:80 -d nginx
+            docker pull httpd
+            docker run --name myhttpd1 -p 80:80 -d httpd
    
   EOF
 
