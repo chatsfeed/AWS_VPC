@@ -887,18 +887,6 @@ resource "aws_instance" "app" {
   }
 }
 
-# We create an elastic IP for our www server
-resource "aws_eip" "app_elastic_ip_1" {
-   vpc = true
-}
-
-# We associate the elastic ip to our www server
-resource "aws_eip_association" "app_eip_1_association" {
-  instance_id   = aws_instance.app.id
-  allocation_id = aws_eip.app_elastic_ip_1.id
-}
-
-
 
 # We create our www instance in public subnet
 resource "aws_instance" "www" {
@@ -924,20 +912,6 @@ resource "aws_instance" "www" {
       Name = "www"
   }
 }
-
-# We create an elastic IP for our www server
-resource "aws_eip" "www_elastic_ip_1" {
-   vpc = true
-}
-
-# We associate the elastic ip to our www server
-resource "aws_eip_association" "www_eip_1_association" {
-  instance_id   = aws_instance.www.id
-  allocation_id = aws_eip.www_elastic_ip_1.id
-}
-
-
-
 
 
 
