@@ -724,26 +724,30 @@ resource "aws_alb_target_group" "tg_load_balancer_https_www" {
 
 
 # Create a new ALB Target Group attachment
-resource "aws_autoscaling_attachment" "asg_alb_attachment_http_www" {
-  autoscaling_group_name = aws_autoscaling_group.auto_scaling_www.id
-  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_http_www.arn
+resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http_app" {
+  target_group_arn = aws_alb_target_group.tg_load_balancer_http_app.arn
+  target_id        = aws_instance.app.id
+  port             = 80
 }
 
-resource "aws_autoscaling_attachment" "asg_alb_attachment_http_app" {
-  autoscaling_group_name = aws_autoscaling_group.auto_scaling_app.id
-  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_http_app.arn
+resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https_app" {
+  target_group_arn = aws_alb_target_group.tg_load_balancer_https_app.arn
+  target_id        = aws_instance.app.id
+  port             = 80
 }
 
-resource "aws_autoscaling_attachment" "asg_alb_attachment_https_www" {
-  autoscaling_group_name = aws_autoscaling_group.auto_scaling_www.id
-  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_www.arn
+
+resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http_www" {
+  target_group_arn = aws_alb_target_group.tg_load_balancer_http_www.arn
+  target_id        = aws_instance.www.id
+  port             = 80
 }
 
-resource "aws_autoscaling_attachment" "asg_alb_attachment_https_app" {
-  autoscaling_group_name = aws_autoscaling_group.auto_scaling_app.id
-  alb_target_group_arn   = aws_alb_target_group.tg_load_balancer_https_app.arn
+resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https_www" {
+  target_group_arn = aws_alb_target_group.tg_load_balancer_https_www.arn
+  target_id        = aws_instance.www.id
+  port             = 80
 }
-
 
 
 # We create our application load balancer
@@ -868,62 +872,6 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_http" {
    
    
 }
-
-
-
-
-#resource "aws_alb_listener_rule" "listener_load_balancer_rule_http" {
-#  depends_on   = [aws_alb_target_group.tg_load_balancer_http_www]  
-#  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
-#  #priority     = 100   
-#  action {    
-#    type             = "forward"    
-#    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_www.id}"  
-#  }  
-   
-#  condition {
-#    host_header {
-#      values = [var.www-website-domain] 
-#    }
-# }
-   
-#}
-
-
-#resource "aws_alb_listener_rule" "listener_load_balancer_rule_root_http" {
-#  depends_on   = [aws_alb_target_group.tg_load_balancer_http_www]  
-#  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
-#  #priority     = 100   
-#  action {    
-#    type             = "forward"    
-#    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_www.id}"  
-#  }  
-   
-#  condition {
-#    host_header {
-#      values = [var.website-domain] 
-#    }
-# }
-   
-#}
-
-
-#resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_http" {
-#  depends_on   = [aws_alb_target_group.tg_load_balancer_http_app]  
-#  listener_arn = aws_alb_listener.listener_load_balancer_http.arn
-#  #priority     = 100   
-#  action {    
-#    type             = "forward"    
-#    target_group_arn = "${aws_alb_target_group.tg_load_balancer_https_app.id}"  
-#  }  
-   
-#  condition {
-#    host_header {
-#      values = [var.app-website-domain] 
-#    }
-# }
-   
-#}
 
 
 
@@ -1058,104 +1006,77 @@ resource "aws_alb_listener_rule" "listener_load_balancer_rule_app_https" {
 
 
 
-
-resource "aws_launch_configuration" "app_instance" {
-  name_prefix   = "app-instance-"
-  image_id      = "ami-077e31c4939f6a2f3" #var.ec2_ami
-  instance_type = var.ec2_type
-  key_name      = aws_key_pair.public_ssh_key.key_name
-  security_groups = [aws_security_group.sg_app.id]
-
+# We create our www instance in public subnet
+resource "aws_instance" "app" {
+  depends_on = [
+    aws_security_group.sg_app
+  ]
+  ami = "ami-077e31c4939f6a2f3"
+  instance_type = "t2.micro"
+  key_name = aws_key_pair.public_ssh_key.key_name
+  vpc_security_group_ids = [aws_security_group.sg_app.id]
+  subnet_id = aws_subnet.public_subnet_1.id
   user_data = <<EOF
             #! /bin/bash
             yum update
             yum install docker -y
             systemctl restart docker
             systemctl enable docker
-            docker run -P -d nginxdemos/hello
+            docker run --rm -it -p 80:80 yeasy/simple-web:latest
   EOF
 
-
-  lifecycle {
-    create_before_destroy = true
+  tags = {
+      Name = "app"
   }
-
-  depends_on = [
-    aws_security_group.sg_app
-  ]
 }
 
-resource "aws_autoscaling_group" "auto_scaling_app" {
-  name                 = "auto-scaling-app"
-  #availability_zones = [var.AZ_1, var.AZ_2] 
-  launch_configuration = aws_launch_configuration.app_instance.id
-  min_size             = 1
-  max_size             = 3
-  vpc_zone_identifier       = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
-  #target_group_arns         = [aws_alb_target_group.tg_load_balancer_https_app.arn]
+# We create an elastic IP for our www server
+resource "aws_eip" "app_elastic_ip_1" {
+   vpc = true
+}
 
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  depends_on = [
-    aws_launch_configuration.app_instance,
-    aws_subnet.public_subnet_1,
-    aws_subnet.public_subnet_2
-    #aws_alb_target_group.tg_load_balancer_http_app,
-    #aws_alb_target_group.tg_load_balancer_https_app 
-  ]
+# We associate the elastic ip to our www server
+resource "aws_eip_association" "app_eip_1_association" {
+  instance_id   = aws_instance.app.id
+  allocation_id = aws_eip.app_elastic_ip_1.id
 }
 
 
-resource "aws_launch_configuration" "www_instance" {
-  name_prefix   = "www-instance-"
-  image_id      = "ami-077e31c4939f6a2f3" #var.ec2_ami
-  instance_type = var.ec2_type
-  key_name      = aws_key_pair.public_ssh_key.key_name
-  security_groups = [aws_security_group.sg_www.id]
 
-   user_data = <<EOF
+# We create our www instance in public subnet
+resource "aws_instance" "www" {
+  depends_on = [
+    aws_security_group.sg_www
+  ]
+  ami = "ami-077e31c4939f6a2f3"
+  instance_type = "t2.micro"
+  key_name = aws_key_pair.public_ssh_key.key_name
+  vpc_security_group_ids = [aws_security_group.sg_www.id]
+  subnet_id = aws_subnet.public_subnet_1.id
+  user_data = <<EOF
             #! /bin/bash
             yum update
             yum install docker -y
             systemctl restart docker
             systemctl enable docker
-            docker run --rm -it -p 80:80 yeasy/simple-web:latest
-   
+            docker pull nginx
+            docker run --name mynginx1 -p 80:80 -d nginx
   EOF
 
-
-  lifecycle {
-    create_before_destroy = true
+  tags = {
+      Name = "www"
   }
-
-  depends_on = [
-    aws_security_group.sg_www
-  ]
 }
 
+# We create an elastic IP for our www server
+resource "aws_eip" "www_elastic_ip_1" {
+   vpc = true
+}
 
-resource "aws_autoscaling_group" "auto_scaling_www" {
-  name                 = "auto-scaling-www"
-  #availability_zones = [var.AZ_1, var.AZ_2] 
-  launch_configuration = aws_launch_configuration.www_instance.id
-  min_size             = 1
-  max_size             = 3
-  vpc_zone_identifier       = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
-  #target_group_arns         = [aws_alb_target_group.tg_load_balancer_https_www.arn]
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  depends_on = [
-    aws_launch_configuration.www_instance,
-    aws_subnet.public_subnet_1,
-    aws_subnet.public_subnet_2
-    #aws_alb_target_group.tg_load_balancer_http_www,
-    #aws_alb_target_group.tg_load_balancer_https_www 
-  ]
+# We associate the elastic ip to our www server
+resource "aws_eip_association" "www_eip_1_association" {
+  instance_id   = aws_instance.www.id
+  allocation_id = aws_eip.www_elastic_ip_1.id
 }
 
 
