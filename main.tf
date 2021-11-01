@@ -555,10 +555,10 @@ resource "aws_alb_target_group" "tg_load_balancer_http_www" {
 
 resource "aws_alb_target_group" "tg_load_balancer_https_app" {
   name     = "tg-load-balancer-https-app"
-  #port     = 443
-  #protocol = "HTTPS"
-  port              = "80"
-  protocol          = "HTTP"   
+  port     = 443
+  protocol = "HTTPS"
+  #port              = "80"
+  #protocol          = "HTTP"   
   vpc_id   = aws_vpc.vpc.id
 
   depends_on = [
@@ -568,10 +568,10 @@ resource "aws_alb_target_group" "tg_load_balancer_https_app" {
 
 resource "aws_alb_target_group" "tg_load_balancer_https_www" {
   name     = "tg-load-balancer-https-www"
-  #port     = 443
-  #protocol = "HTTPS"
-  port              = "80"
-  protocol          = "HTTP"   
+  port     = 443
+  protocol = "HTTPS"
+  #port              = "80"
+  #protocol          = "HTTP"   
   vpc_id   = aws_vpc.vpc.id
 
   depends_on = [
