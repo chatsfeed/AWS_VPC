@@ -18,6 +18,11 @@ variable "ec2_type" {
   default = "t2.micro"
 }
 
+variable "app_ec2_type" {
+  description = "The type of ec2 instances for app server"
+  default = "t2.medium"
+}
+
 variable "website-domain" {
   description = "Root domain"
   type        = string
