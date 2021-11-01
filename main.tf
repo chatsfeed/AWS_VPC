@@ -590,7 +590,7 @@ resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http_ap
 resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https_app" {
   target_group_arn = aws_alb_target_group.tg_load_balancer_https_app.arn
   target_id        = aws_instance.app.id
-  port             = 80
+  port             = 443
 }
 
 
@@ -603,7 +603,7 @@ resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_http_ww
 resource "aws_alb_target_group_attachment" "tg_load_balancer_attachement_https_www" {
   target_group_arn = aws_alb_target_group.tg_load_balancer_https_www.arn
   target_id        = aws_instance.www.id
-  port             = 80
+  port             = 443
 }
 
 
