@@ -869,7 +869,7 @@ resource "aws_instance" "app" {
     aws_security_group.sg_app
   ]
   ami = var.ec2_ami  #"ami-077e31c4939f6a2f3"
-  instance_type = "t2.micro"
+  instance_type = "t2.medium"
   key_name = aws_key_pair.public_ssh_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_app.id]
   subnet_id = aws_subnet.public_subnet_1.id
