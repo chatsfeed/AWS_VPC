@@ -98,7 +98,7 @@ resource "aws_route53_record" "app_cname_route53_record" {
 # setting mail from
 resource "aws_ses_domain_mail_from" "mail_from" {
   domain           = aws_ses_domain_identity.domain_identity.domain
-  mail_from_domain = "bounce.${aws_ses_domain_identity.domain_identity.domain}"
+  mail_from_domain = "mail.${aws_ses_domain_identity.domain_identity.domain}"
 }
 
 # Example SES Domain Identity
