@@ -8,6 +8,13 @@ output "url" {
   value = "http://${aws_alb.load_balancer.dns_name}/"
 }
 
+output "smtp_username" {
+  value = aws_iam_access_key.smtp_user.id
+}
+
+output "smtp_password" {
+  value = aws_iam_access_key.smtp_user.ses_smtp_password_v4
+}
 
 output "bastion_host_1_public_ip" {  
   value = "${aws_eip.bastion_elastic_ip_1.public_ip}"
