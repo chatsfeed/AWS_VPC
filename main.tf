@@ -78,22 +78,55 @@ resource "aws_route53_record" "app_cname_route53_record" {
 }
 
 
-resource "aws_route53_record" "domain_mx_record" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "domain-mx-record"
-  type    = "MX"
+#resource "aws_route53_record" "domain_mx_record" {
+#  zone_id = aws_route53_zone.main.zone_id
+#  name    = "domain-mx-record"
+#  type    = "MX"
   
-  records = [
-    "1 ASPMX.L.GOOGLE.COM",
-    "5 ALT1.ASPMX.L.GOOGLE.COM",
-    "5 ALT2.ASPMX.L.GOOGLE.COM",
-    "10 ASPMX2.GOOGLEMAIL.COM",
-    "10 ASPMX3.GOOGLEMAIL.COM",  
-  ]
+#  records = [
+#    "1 ASPMX.L.GOOGLE.COM",
+#    "5 ALT1.ASPMX.L.GOOGLE.COM",
+#    "5 ALT2.ASPMX.L.GOOGLE.COM",
+#    "10 ASPMX2.GOOGLEMAIL.COM",
+#    "10 ASPMX3.GOOGLEMAIL.COM",  
+#  ]
   
-  ttl = "3600"
+#  ttl = "3600"
+#}
+
+
+# setting mail from
+resource "aws_ses_domain_mail_from" "mail_from" {
+  domain           = aws_ses_domain_identity.domain_identity.domain
+  mail_from_domain = "bounce.${aws_ses_domain_identity.domain_identity.domain}"
 }
 
+# Example SES Domain Identity
+resource "aws_ses_domain_identity" "domain_identity" {
+  domain = "chatsfeed.com"
+}
+
+# Example Route53 MX record
+resource "aws_route53_record" "mail_from_mx" {
+  zone_id = aws_route53_zone.main.id
+  name    = aws_ses_domain_mail_from.mail_from.mail_from_domain
+  type    = "MX"
+  ttl     = "600"
+  records = ["10 email-smtp.us-east-2.amazonaws.com"] # Change to the region in which `aws_ses_domain_identity.example` is created
+}
+
+# Example Route53 TXT record for SPF
+resource "aws_route53_record" "mail_from_txt" {
+  zone_id = aws_route53_zone.main.id
+  name    = aws_ses_domain_mail_from.mail_from.mail_from_domain
+  type    = "TXT"
+  ttl     = "600"
+  records = ["v=spf1 include:amazonses.com -all"]
+}
+
+
+
+# setting smtp
 resource "aws_iam_user" "smtp_user" {
   name = "smtp_user"
 }
