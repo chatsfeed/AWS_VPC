@@ -78,16 +78,22 @@ resource "aws_route53_record" "app_cname_route53_record" {
 }
 
 
+resource "aws_route53_record" "domain_mx_record" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "domain-mx-record"
+  type    = "MX"
+  
+  records = [
+    "1 ASPMX.L.GOOGLE.COM",
+    "5 ALT1.ASPMX.L.GOOGLE.COM",
+    "5 ALT2.ASPMX.L.GOOGLE.COM",
+    "10 ASPMX2.GOOGLEMAIL.COM",
+    "10 ASPMX3.GOOGLEMAIL.COM",  
+  ]
+  
+  ttl = "3600"
+}
 
-##https://engineering.resolvergroup.com/2020/06/how-to-redirect-an-apex-domain-to-www-using-cloudfront-and-s3/
-# bucket to redirect apex record to cname
-#resource "aws_s3_bucket" "apex_domain_redirect_bucket" {
-  #bucket = var.website-domain
-  #acl    = "public-read"
-  #website {
-    #redirect_all_requests_to = "https://${var.www-website-domain}"
-  #}
-#}
 
 
 # Creates bucket to store logs
