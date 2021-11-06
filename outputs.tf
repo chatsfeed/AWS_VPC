@@ -14,7 +14,7 @@ output "smtp_username" {
 
 output "smtp_password" {
   value = aws_iam_access_key.smtp_user.ses_smtp_password_v4
-  sensitive = false
+  sensitive = true
 }
 
 output "bastion_host_1_public_ip" {  
