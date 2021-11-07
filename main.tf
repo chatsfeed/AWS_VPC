@@ -112,7 +112,7 @@ resource "aws_route53_record" "mail_from_mx" {
   name    = aws_ses_domain_mail_from.mail_from.mail_from_domain
   type    = "MX"
   ttl     = "600"
-  records = ["10 email-smtp.us-east-2.amazonaws.com"] # Change to the region in which `aws_ses_domain_identity.example` is created
+  records = ["10 feedback-smtp.us-east-2.amazonses.com"] # Change to the region in which `aws_ses_domain_identity.example` is created
 }
 
 # Example Route53 TXT record for SPF
@@ -121,7 +121,7 @@ resource "aws_route53_record" "mail_from_txt" {
   name    = aws_ses_domain_mail_from.mail_from.mail_from_domain
   type    = "TXT"
   ttl     = "600"
-  records = ["v=spf1 include:amazonses.com -all"]
+  records = ["v=spf1 include:amazonses.com ~all"]
 }
 
 
